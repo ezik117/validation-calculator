@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+		<meta charset="utf-8">
+		<script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+</head>
+<body>
+
+<style>
+	.calc {
+		background-color: rgb(119, 118, 118);
+		border: 1px solid black;
+		border-radius: 15px;
+		width: 450px;
+	}
+	.display {
+		margin: 1rem;
+		padding: 5px;
+		border: 1px solid black;
+		border-radius: 2px;
+		background-color: gainsboro;
+		width: 400px;
+		font-family: monospace;
+		font-size: 3em;
+		text-align: right;
+		vertical-align: middle;
+	}
+	.btn2 {
+		margin-left: 3rem !important;
+	}
+	.btn3 {
+		width: 132px !important;
+	}
+	.button {
+		border: 1px solid black;
+		border-radius: 25px;
+		float: left;
+		width: 50px;
+		height: 50px;
+		line-height: 50px;
+		background-color: coral;
+		color: black;
+		vertical-align: middle;
+		text-align: center;
+		font-weight: bold;
+		font-size: 150%;
+		margin: 15px;
+		cursor: pointer;
+	}
+	.buttonFunc {
+		border: 1px solid black;
+		border-radius: 5px;
+		float: left;
+		width: 50px;
+		height: 50px;
+		line-height: 50px;
+		background-color:mediumslateblue;
+		color: white;
+		vertical-align: middle;
+		text-align: center;
+		font-weight: bold;
+		margin: 15px;
+		cursor: pointer;
+	}
+	.buttonOperation {
+		border: 1px solid black;
+		border-radius: 5px;
+		float: left;
+		width: 50px;
+		height: 50px;
+		line-height: 50px;
+		background-color:crimson;
+		color: white;
+		vertical-align: middle;
+		text-align: center;
+		font-weight: bold;
+		margin: 15px;
+		cursor: pointer;
+	}
+	.button:active {
+		background-color:rgb(253, 253, 123);
+	}
+	.buttonFunc:active, .buttonOperation:active {
+		background-color:rgb(253, 253, 123);
+		color: black;
+	}	
+	.noselect {
+		-webkit-touch-callout: none; /* iOS Safari */
+			-webkit-user-select: none; /* Safari */
+			-khtml-user-select: none; /* Konqueror HTML */
+			-moz-user-select: none; /* Old versions of Firefox */
+				-ms-user-select: none; /* Internet Explorer/Edge */
+					user-select: none; /* Non-prefixed version, currently
+										supported by Chrome, Opera and Firefox */
+	}
+</style>
+
+<div id="app" class="calc">
+	<div class="display">{{R3}}</div>
+	<br>
+	<div class="button noselect" @click="keyPress">7</div>
+	<div class="button noselect" @click="keyPress">8</div>
+	<div class="button noselect" @click="keyPress">9</div>
+	<div class="buttonFunc btn2 noselect" @click="keyPressClear">C</div>
+	<div class="buttonFunc noselect" @click="keyPressBS">&lt;&lt;</div>
+	<div style="clear: left;"></div>
+	<div class="button noselect" @click="keyPress">4</div>
+	<div class="button noselect" @click="keyPress">5</div>
+	<div class="button noselect" @click="keyPress">6</div>
+	<div class="buttonOperation btn2 noselect" @click="keyPressOperation('add')">+</div>
+	<div class="buttonOperation noselect" @click="keyPressOperation('mul')">*</div>
+	<div style="clear: left;"></div>
+	<div class="button noselect" @click="keyPress">1</div>
+	<div class="button noselect" @click="keyPress">2</div>
+	<div class="button noselect" @click="keyPress">3</div>
+	<div class="buttonOperation btn2 noselect" @click="keyPressOperation('sub')">-</div>
+	<div class="buttonOperation noselect" @click="keyPressOperation('div')">/</div>
+	<div style="clear: left;"></div>
+	<div class="button noselect" @click="keyPress">0</div>
+	<div class="button noselect" @click="keyPressDot">.</div>
+	<div class="button noselect" @click="keyPressSign">+/-</div>
+	<div class="buttonFunc btn2 btn3 noselect" @click="keyPressResult">=</div>
+	<div style="clear: left;"></div>	
+</div>
+<br>
+<div>2020. VUE.JS test calculator by EzikSoft</div>
+
+<script>
+	var app = new Vue({
+		el: '#app',
+		data: {
+			maxDisplayNumbers: 18, // константа: максимум символов на экране без учета знака
+			fillR3: true, //1-новый ввод в дисплей, 0-управление вводом в дисплей
+			OperationSelected: 'none', // выбранное алгебраическое действие
+			R1: "0", // регистр А (значение в виде текста)
+			R3: "0", // значение на экране (значение в виде текста)
+			lastOperation: {R3: null, operation: 'none'}, // хранение последней операции для Равно
+			overflow: false // указывает на переполнение, все операции блокируются кроме Reset
+		},
+		methods: {
+			// сохраняет и отображает R3 с учетом максимальной длины после арифметических операций
+			displayR3: function(newR3) {
+				// преобразуем в строку и ее знак
+				newR3 = String(newR3).replace(',', '.');
+				let sign = '';
+				if (newR3[0] == '-')
+				{
+					newR3 = newR3.slice(1);
+					sign = '-';
+				}
+
+				// проверим на переполнение
+				if ( String(parseInt(newR3)).length > this.maxDisplayNumbers )
+				{
+					this.overflow = true;
+					this.R3 = "ОШИБКА ПЕРЕПОЛНЕНИЯ";
+					return;
+				}
+
+				// отобразим с обрезкой десятичных дробей
+				this.R3 = sign + newR3.slice(0, this.maxDisplayNumbers);
+			},
+			// возвращает длину R3 без учета знака
+			getR3Len: function() {
+				var len = this.R3.length;
+				if (this.R3[0] == '-') len --;
+				return len;
+			},
+			// нажата клавиша с цифрой - добавим на экран (R3)
+			keyPress: function(event) {
+				if (this.overflow) return;
+
+				let k = event.target.textContent;
+
+				if (k == '0' && this.R3 == '0')
+				{
+					return;
+				}
+				else
+				{
+					if (this.R3 == '0' || this.fillR3)
+					{
+						this.R3 = k;
+						this.fillR3 = false;
+					}
+					else
+					{
+						if (this.getR3Len() < this.maxDisplayNumbers)
+							this.R3 += k;;
+					}
+				}
+			},
+			// нажата клавиша Сброс - сбросим все регистры
+			keyPressClear: function() {
+				this.overflow = false;
+				this.R3 = '0';
+				this.lastOperation.R3 = this.R1 = null;
+				this.lastOperation.operation = this.OperationSelected = 'none';
+			},
+			// нажата клавиша с точкой
+			keyPressDot: function() {
+				if (this.overflow) return;
+
+				if (this.R3.indexOf('.') == -1)
+				{
+					if (this.R3 == '0')
+						this.R3 = '0.';
+					else
+						this.R3 += '.';
+				}
+			},
+			// нажата клавиша знака
+			keyPressSign: function() {
+				if (this.overflow) return;
+
+				if (this.R3 == '0') return;
+				if (this.R3[0] == '-')
+					this.R3 = this.R3.slice(1);
+				else
+					this.R3 = '-' + this.R3;
+			},
+			// нажата клавиша Стереть последний символ
+			keyPressBS: function() {
+				if (this.overflow) return;
+
+				if (this.getR3Len() > 1)
+					this.R3 = this.R3.slice(0,-1);
+				else
+					this.R3 = '0';
+			},
+			// нажата клавиша арифметических операций
+			keyPressOperation: function(action) {
+				if (this.overflow) return;
+
+				if (this.fillR3)
+				{
+					this.OperationSelected = action;
+					 return;
+				}
+
+				if (this.R1 != null)
+				{
+					// если регистр R1 не пустой, выполним предыдущую операцию
+					this.processValues();
+					this.R1 = this.R3;
+					this.OperationSelected = action;
+					this.fillR3 = true;
+				}
+				else
+				{
+					// иначе отправим в регистр R1 значение на экране R3
+					this.OperationSelected = action;
+					this.R1 = this.R3;
+					this.fillR3 = true;
+				}
+			},
+			// нажата клавиша Равно
+			keyPressResult: function() {
+				if (this.overflow) return;
+
+				if (this.R1 == null) return;
+				
+				if (this.OperationSelected != 'none')
+				{
+					// запомним последнюю операцию для повтора
+					this.lastOperation.R3 = this.R3;
+					this.lastOperation.operation = this.OperationSelected;
+				}
+				else
+				{
+					// выполним последнюю операцию
+					this.R1 = this.R3;
+					this.R3 = this.lastOperation.R3;
+					this.OperationSelected = this.lastOperation.operation;
+				}
+				// вычислим
+				this.processValues();
+				this.R1 = this.R3;
+				this.OperationSelected = 'none';
+				this.fillR3 = true;
+			},
+			processValues: function() {		
+				if (this.OperationSelected == 'add')
+				{
+					this.displayR3( String(parseFloat(this.R1) + parseFloat(this.R3)) );
+				}
+				else if (this.OperationSelected == 'sub')
+				{
+					this.displayR3( String(parseFloat(this.R1) - parseFloat(this.R3)) );
+				}
+				else if (this.OperationSelected == 'mul')
+				{
+					this.displayR3( String(parseFloat(this.R1) * parseFloat(this.R3)) );
+				}
+				else if (this.OperationSelected == 'div')
+				{
+					this.displayR3( String(parseFloat(this.R1) / parseFloat(this.R3)) );
+				}
+			}
+		}
+	});
+</script>
+
+</body>
+</html>
