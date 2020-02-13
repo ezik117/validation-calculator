@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html lang="ru-RU">
+<head>
+	<meta charset="utf-8">
+</head>
+<body>
+
+	<span style="font-size: 80%;">Документ создан с помощью https://www.tablesgenerator.com/html_tables#</span>
+
+	<h3 style="text-align: center; color:black;">СПЕЦИФИКАЦИЯ ТРЕБОВАНИЙ ПОЛЬЗОВАТЕЛЯ</h3>
+	<h3 style="text-align: center; color:blue;">USER REQUIREMENTS SPECIFICATION (URS)</h3>
+
+	<h5 style="text-align: center;">Код документа: CALC-URS-01-01</h5>
+
+
+	<style type="text/css">
+		.tg  {border-collapse:collapse;border-spacing:0;border-color:#93a1a1;margin:0px auto;}
+		.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#93a1a1;color:#002b36;background-color:#fdf6e3;}
+		.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#93a1a1;color:#fdf6e3;background-color:#657b83;}
+		.tg .tg-g59y{font-weight:bold;background-color:#ffce93;border-color:#000000;text-align:left;vertical-align:top}
+		.tg .tg-73oq{border-color:#000000;text-align:left;vertical-align:top}
+		.tg-sort-header::-moz-selection{background:0 0}.tg-sort-header::selection{background:0 0}.tg-sort-header{cursor:pointer}.tg-sort-header:after{content:'';float:right;margin-top:7px;border-width:0 5px 5px;border-style:solid;border-color:#404040 transparent;visibility:hidden}.tg-sort-header:hover:after{visibility:visible}.tg-sort-asc:after,.tg-sort-asc:hover:after,.tg-sort-desc:after{visibility:visible;opacity:.4}.tg-sort-desc:after{border-bottom:none;border-width:5px 5px 0}</style>
+		<table id="tg-42Dw3" class="tg" style="undefined;table-layout: fixed; width: 1121px">
+		<colgroup>
+		<col style="width: 110px">
+		<col style="width: 173px">
+		<col style="width: 665px">
+		<col style="width: 173px">
+		</colgroup>
+		  <tr>
+			<th class="tg-73oq">ID</th>
+			<th class="tg-73oq">Краткое<br>название</th>
+			<th class="tg-73oq">Требование</th>
+			<th class="tg-73oq">Обязательное(О) /<br>Рекомендуемое(Р)</th>
+		  </tr>
+		  <tr>
+			<td class="tg-g59y" colspan="4">ЧИСЛА</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">NUM-001.01</td>
+			<td class="tg-73oq" rowspan="2">Типы чисел</td>
+			<td class="tg-73oq">Должны поддерживаться как целочисленные так и дробные числа.</td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">NUM-001.02</td>
+			<td class="tg-73oq">Для дробных чисел разделителем является символ точки ".".</td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">NUM-002.01</td>
+			<td class="tg-73oq" rowspan="2">Знак числа</td>
+			<td class="tg-73oq">Должны поддерживаться как положительные, так и отрицательные числа.</td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">NUM-002.02</td>
+			<td class="tg-73oq">Для положительных числе знак "+" не отображается.<br>Для отрицательных чисел должен отображаться знак "-" в начале числа.</td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		  <tr>
+			<td class="tg-g59y" colspan="4">ИНТЕРФЕЙС. КЛАВИШИ.</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">INT-K-001</td>
+			<td class="tg-73oq">Клавиши ввода числа</td>
+			<td class="tg-73oq">Ввод числа производится посредством нажатия на экранные клавиши от "0" до "9". </td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">INT-K-002</td>
+			<td class="tg-73oq">Дополнительные клавиши ввода</td>
+			<td class="tg-73oq">1)Для ввода дробной части используется клавиша ".".<br>2)Для смены знака числа используется клавиша "+/-". При нажатии на клавишу происходит смена знака числа на противоположный.</td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">INT-K-003</td>
+			<td class="tg-73oq">Клавиши выбора арифметических операций</td>
+			<td class="tg-73oq">1) Для выполнения операций используются клавиши:<br>  "+" - для суммирования,<br>  "-" - для вычитания,<br>  "*" - для умножения,<br>  "/" - для деления<br>2) Кроме того, если до нажатия клавиши выбора арифметической операции уже были введены два числа A и B, то необходимо выполнить предыдущую арифметическую операцию и ее результат будет операндом A. Т.е. при последовательном вводе 1 + 2 + 4, вначале будут введены числа A= 1, B=2, при нажатии следующего "+" будет произведено суммирование A и B, результат помещен в A=3 и следующая операция будет 3 + 4. (более подробно смотри раздел "Выполнение арифметических операций")</td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">INT-K-004</td>
+			<td class="tg-73oq">Клавиша сброса</td>
+			<td class="tg-73oq">Клавиша "С" предназначена для очистки полученных результатов и ошибок, и сброса состояния калькулятора на первоначальное.</td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">INT-K-005</td>
+			<td class="tg-73oq">Клавиша BackSpace</td>
+			<td class="tg-73oq">Клавиша "&lt;&lt;" используется для удаления последнего значения числа отображаемого на дисплее. При этом удаление символа применяется именно к отображаемому числу, вне зависимости от того, как оно было получено: введено с клавиатуры или получено в результате арифметических действий.</td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">INT-K-006</td>
+			<td class="tg-73oq">Клавиша выполнения вычисления</td>
+			<td class="tg-73oq">Клавиша "=" предназначена для выполнения:<br>  - вычисления значения введенных двух чисел<br>  - автоматического вычисления последней операции с числом<br>(более подробно смотри раздел "Выполнение арифметических операций")</td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		  <tr>
+			<td class="tg-g59y" colspan="4">ИНТЕРФЕЙС. ДИСПЛЕЙ ВЫВОДА.</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">INT-D-001</td>
+			<td class="tg-73oq">Отображение результата</td>
+			<td class="tg-73oq">Отображаемая длина числа не должна превышать 18 символов без учета знака минуса.</td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		  <tr>
+			<td class="tg-g59y" colspan="4">ВЫПОЛНЕНИЕ АРИФМЕТИЧЕСКИХ ОПЕРАЦИЙ</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">AR-001</td>
+			<td class="tg-73oq">Суммирование</td>
+			<td class="tg-73oq">Программа должна выполнять сложение двух введенных с клавиатуры чисел: A + B, а также суммировать последнее полученное в результате арифметических действий число с числом введенным с клавиатуры.</td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">AR-002</td>
+			<td class="tg-73oq">Вычитание</td>
+			<td class="tg-73oq">Программа должна выполнять вычитание двух введенных с клавиатуры чисел: A - B, а также вычитать из последнего полученного в результате арифметических действий числа число введенное с клавиатуры.</td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">AR-003</td>
+			<td class="tg-73oq">Умножение</td>
+			<td class="tg-73oq">Программа должна выполнять умножение двух введенных с клавиатуры чисел: A * B, а также умножать последнее полученное в результате арифметических действий число с числом введенным с клавиатуры.</td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">AR-004</td>
+			<td class="tg-73oq">Деление</td>
+			<td class="tg-73oq">Программа должна выполнять деление двух введенных с клавиатуры чисел: A / B, а также делить последнее полученное в результате арифметических действий число на число введенное с клавиатуры.</td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">AR-005</td>
+			<td class="tg-73oq">Начало вычисления</td>
+			<td class="tg-73oq">Процесс вычисления должен начинаться либо по нажатию клавиши "=" либо по нажатию одной из клавиш арифметических операций. При этом условием начала вычислений должно является наличие двух чисел, введенных ранее, или наличие результата предыдущей арифметической операции на дисплее и введенного числа с клавиатуры.</td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">AR-006</td>
+			<td class="tg-73oq">Повторное вычисление с константой</td>
+			<td class="tg-73oq">В случае, если необходимо произвести вычисление, где операнд B является константой, а операнд A является полученным значением, должна использоваться клавиша "=". При этом результат помещается в операнд A, а операнд B и арифметическая операция остаются неизменными. Каждое нажатие клавиши "=" производит автоматическое повторение последней операции с константой B. Например: 2+2=&lt;4&gt; = &lt;6&gt; = &lt;8&gt; ...</td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		  <tr>
+			<td class="tg-73oq">AR-007</td>
+			<td class="tg-73oq">Проверка ошибок</td>
+			<td class="tg-73oq">Должны обрабатываться две ошибки:<br>1) Деление на ноль. В этом случае на экране должно отобразится сообщение "Деление на ноль"<br>2) Переполнение. Если целая часть числа превышает 18 знакомест без учета знака, то должно отобразится "Ошибка переполнения"<br>В случае любой из ошибок ввод любых чисел или выполнение операций запрещено.<br>Выход из состояния ошибки должен производится только по нажатию на клавишу сброса "С".</td>
+			<td class="tg-73oq">О</td>
+		  </tr>
+		</table>
+		<script charset="utf-8">var TGSort=window.TGSort||function(n){"use strict";function r(n){return n.length}function t(n,t){if(n)for(var e=0,a=r(n);a>e;++e)t(n[e],e)}function e(n){return n.split("").reverse().join("")}function a(n){var e=n[0];return t(n,function(n){for(;!n.startsWith(e);)e=e.substring(0,r(e)-1)}),r(e)}function o(n,r){return-1!=n.map(r).indexOf(!0)}function u(n,r){return function(t){var e="";return t.replace(n,function(n,t,a){return e=t.replace(r,"")+"."+(a||"").substring(1)}),l(e)}}function i(n){var t=l(n);return!isNaN(t)&&r(""+t)+1>=r(n)?t:NaN}function s(n){var e=[];return t([i,m,g],function(t){var a;r(e)||o(a=n.map(t),isNaN)||(e=a)}),e}function c(n){var t=s(n);if(!r(t)){var o=a(n),u=a(n.map(e)),i=n.map(function(n){return n.substring(o,r(n)-u)});t=s(i)}return t}function f(n){var r=n.map(Date.parse);return o(r,isNaN)?[]:r}function v(n,r){r(n),t(n.childNodes,function(n){v(n,r)})}function d(n){var r,t=[],e=[];return v(n,function(n){var a=n.nodeName;"TR"==a?(r=[],t.push(r),e.push(n)):("TD"==a||"TH"==a)&&r.push(n)}),[t,e]}function p(n){if("TABLE"==n.nodeName){for(var e=d(n),a=e[0],o=e[1],u=r(a),i=u>1&&r(a[0])<r(a[1])?1:0,s=i+1,v=a[i],p=r(v),l=[],m=[],g=[],h=s;u>h;++h){for(var N=0;p>N;++N){r(m)<p&&m.push([]);var T=a[h][N],C=T.textContent||T.innerText||"";m[N].push(C.trim())}g.push(h-s)}var L="tg-sort-asc",E="tg-sort-desc",b=function(){for(var n=0;p>n;++n){var r=v[n].classList;r.remove(L),r.remove(E),l[n]=0}};t(v,function(n,t){l[t]=0;var e=n.classList;e.add("tg-sort-header"),n.addEventListener("click",function(){function n(n,r){var t=d[n],e=d[r];return t>e?a:e>t?-a:a*(n-r)}var a=l[t];b(),a=1==a?-1:+!a,a&&e.add(a>0?L:E),l[t]=a;var i=m[t],v=function(n,r){return a*i[n].localeCompare(i[r])||a*(n-r)},d=c(i);(r(d)||r(d=f(i)))&&(v=n);var p=g.slice();p.sort(v);for(var h=null,N=s;u>N;++N)h=o[N].parentNode,h.removeChild(o[N]);for(var N=s;u>N;++N)h.appendChild(o[s+p[N-s]])})})}}var l=parseFloat,m=u(/^(?:\s*)([+-]?(?:\d+)(?:,\d{3})*)(\.\d*)?$/g,/,/g),g=u(/^(?:\s*)([+-]?(?:\d+)(?:\.\d{3})*)(,\d*)?$/g,/\./g);n.addEventListener("DOMContentLoaded",function(){for(var t=n.getElementsByClassName("tg"),e=0;e<r(t);++e)try{p(t[e])}catch(a){}})}(document);</script>
+
+
+</body>
+</html>
