@@ -31,8 +31,8 @@ def elementaryAdd(A:str, B:str, precision:int = 15):
 		return "Error"
 
 	# переведем строковые числа в 1-байтовое хранение, для ускорения обработки
-	A = A.encode('Latin-1')
-	B = B.encode('Latin-1')
+	#A = A.encode().decode('Latin-1')
+	#B = B.encode).decode('Latin-1')
 		
 	# добавим десятичную часть если нет, нужно для единства подхода обработки как дробных так и целых чисел
 	if A.find('.') < 0: A += ".0"
@@ -109,3 +109,5 @@ def elementaryMul(A:str, B:str, precision:int = 15):
 # -------------------------------------------------------------------------------------------------
 def elementaryDiv(A:str, B:str, precision:int = 15):
 	pass
+
+print(elementaryAdd("10", "20", 5))
