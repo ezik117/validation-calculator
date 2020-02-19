@@ -118,7 +118,7 @@ class Calc:
 		if A:
 			self.A.load(A)
 
-		# логика сложения здесь, пока показывает загруженные числа
+		# логика сложения здесь. пока показывает загруженные числа
 		print("A=" + self.A.buildString(raw=True))
 		print("B=" + self.B.buildString(raw=True))
 
@@ -138,7 +138,7 @@ class Calc:
 
 	# положить данные в стек
 	def __stackPush(self:object, data:object):
-		self.__STACK.append(getattr(self, regisry))
+		self.__STACK.append(getattr(self, data))
 
 	# достать данные из стека
 	def __stackPop(self:object):
