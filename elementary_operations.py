@@ -32,7 +32,7 @@ def elementaryAdd(A:str, B:str, precision:int = 15):
 
 	# переведем строковые числа в 1-байтовое хранение, для ускорения обработки
 	#A = A.encode().decode('Latin-1')
-	#B = B.encode).decode('Latin-1')
+	#B = B.encode()).decode('Latin-1')
 		
 	# добавим десятичную часть если нет, нужно для единства подхода обработки как дробных так и целых чисел
 	if A.find('.') < 0: A += ".0"
