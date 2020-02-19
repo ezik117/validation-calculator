@@ -12,6 +12,8 @@
 #            Числа хранятся в обычной записи (т.е. без использования мантиссы)
 # *****************************************************************************
 
+import copy
+
 # ================================================================================================
 
 class Registry:
@@ -126,15 +128,15 @@ class Calc:
 		return True
 
 	# вычитание
-	def sub(self:object):
+	def sub(self:object, B:str=None, A:str=None):
 		pass
 
 	# умножение
-	def mul(self:object):
+	def mul(self:object, B:str=None, A:str=None):
 		pass
 
 	# деление
-	def div(self:object):
+	def div(self:object, B:str=None, A:str=None):
 		pass
 
 	# --- приватные методы --------------------------------
@@ -142,7 +144,7 @@ class Calc:
 	# положить данные в стек LIFO
 	# IN: data - любой объект
 	def __stackPush(self:object, data:object):
-		self.__STACK.append(data)
+		self.__STACK.append(copy.deepcopy(data))
 
 	# достать данные из стека
 	# OUT: объект или None, если стек пустой
