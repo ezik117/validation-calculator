@@ -110,6 +110,7 @@ class Calc:
 	# сложение
 	# IN: A - первое значение для сложения, если не указано берется текущее значение из регистра A
 	# IN: B - второе значение для сложения, если не указано берется текущее значение из регистра B
+	# OUT: True - если операция прошла удачно, False если нет
 	# OUT: результат помещается в регистр A, регистр B не уничтожается
 	def add(self:object, B:str=None, A:str=None):
 		# загрузка чисел
@@ -121,6 +122,8 @@ class Calc:
 		# логика сложения здесь. пока показывает загруженные числа
 		print("A=" + self.A.buildString(raw=True))
 		print("B=" + self.B.buildString(raw=True))
+
+		return True
 
 	# вычитание
 	def sub(self:object):
@@ -136,17 +139,32 @@ class Calc:
 
 	# --- приватные методы --------------------------------
 
-	# положить данные в стек
+	# положить данные в стек LIFO
+	# IN: data - любой объект
 	def __stackPush(self:object, data:object):
-		self.__STACK.append(getattr(self, data))
+		self.__STACK.append(data)
 
 	# достать данные из стека
+	# OUT: объект или None, если стек пустой
 	def __stackPop(self:object):
 		if len(self.__STACK) > 0:
 			return self.__STACK.pop()
 		else:
 			return None
 
-	# очистить стек
-	def __stackClear(self:object):
-		self.__STACK = []
+	# очистить стек на указанную глубину
+	# IN: depth - глубина очистки, если не указано удаляется весь стек
+	def __stackClear(self:object, depth:int=None):
+		if depth:
+			self.__STACK = self.__STACK[:-depth]
+		else:
+			self.__STACK = []
+
+	# вернуть копию стека как список
+	# сам стек не удаляется
+	# IN: depth - глубина стека. Если не указано - возвращается весь стек
+	def __stackGet(self:object, depth:int=None):
+		if depth:
+			return list(self.__STACK[-depth:])
+		else:
+			return list(self.__STACK)
