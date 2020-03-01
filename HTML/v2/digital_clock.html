@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+		<meta charset="utf-8">
+		<script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+</head>
+<body style="background-color: black;">
+
+	<style>
+		#clock {
+			/*border: 1px solid red;*/
+			background-color: black;
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			/*margin-left: -425px;
+			margin-top: -170px;*/
+			margin-left: -680px;
+			margin-top: -325px;
+
+			/*opacity: 0.5;*/
+		}
+	</style>
+
+	<canvas id="clock" width="1360" height="550">
+	<!--<canvas id="clock" width="1200" height="500">-->
+	</canvas>
+
+	<script>
+
+		var scale = 1.0; // коэффициент приведения
+		var k1 = 20 * scale; // размер малой диагонали сегмента
+		var k2 = 100 * scale; // длина прямой сегмента
+		var color = "#F0FF0F"; // цвет свечения
+		var fade = "#010101"; // цвет неактивного сегмента
+
+		var tickStatus = true; // вспомогательная переменная для эффекта мигания точки
+		var lastTime = 0; // последнее считанное время (для оптимизации отображения)
+
+		var currWidth = 0;
+		var currHeight = 0; // последние считанные значения ширины и высоты текущего окна
+
+		var digitsArray = [
+			[true,  true,  true,  true,  true,  true,  false], // 0
+			[false, true,  true,  false, false, false, false], // 1
+			[true,  true,  false, true,  true,  false, true],  // 2
+			[true,  true,  true,  true,  false, false, true],  // 3
+			[false, true,  true,  false, false, true,  true],  // 4
+			[true,  false, true,  true,  false, true,  true],  // 5
+			[true,  false, true,  true,  true,  true,  true],  // 6
+			[true,  true,  true,  false, false, false, false], // 7
+			[true,  true,  true,  true,  true,  true,  true],  // 8
+			[true,  true,  true,  true,  false, true,  true]   // 9
+		];
+
+		// отрисовка цифры
+		drawDigit = function(ctx, x, y, digit) {
+			drawElementA(ctx, x,           y,     digitsArray[digit][0]); // A
+			drawElementB(ctx, x+155*scale, y+45*scale,  digitsArray[digit][1]); // B
+			drawElementC(ctx, x+155*scale, y+195*scale, digitsArray[digit][2]); // C
+			drawVElement(ctx, x+45*scale,  y+300*scale, digitsArray[digit][3]); // D
+			drawHElement(ctx, x,     y+195*scale, digitsArray[digit][4]); // E
+			drawHElement(ctx, x,     y+45*scale,  digitsArray[digit][5]); // F
+			drawVElement(ctx, x+45*scale,  y+150*scale, digitsArray[digit][6]); // G
+		};
+
+		drawElementA = function(ctx, x, y, on) {
+			if (on)	ctx.fillStyle=color; else ctx.fillStyle=fade;
+			ctx.beginPath();
+			ctx.moveTo(x, y);
+			ctx.lineTo(x+190*scale, y);
+			ctx.lineTo(x+150*scale, y+40*scale);
+			ctx.lineTo(x+40*scale, y+40*scale);
+			ctx.lineTo(x, y);
+			ctx.stroke();
+			ctx.fill();
+		};
+
+		drawElementB = function(ctx, x, y, on) {
+			if (on)	ctx.fillStyle=color; else ctx.fillStyle=fade;
+			ctx.beginPath();
+			ctx.moveTo(x, y);
+			ctx.lineTo(x+40*scale, y-40*scale);
+			ctx.lineTo(x+40*scale, y+100*scale);
+			ctx.lineTo(x+20*scale, y+120*scale);
+			ctx.lineTo(x, y+100*scale);
+			ctx.lineTo(x, y);
+			ctx.stroke();
+			ctx.fill();
+		};
+
+		drawElementC = function(ctx, x, y, on) {
+			if (on)	ctx.fillStyle=color; else ctx.fillStyle=fade;
+			ctx.beginPath();
+			ctx.moveTo(x, y);
+			ctx.lineTo(x+20*scale, y-20*scale);
+			ctx.lineTo(x+40*scale, y);
+			ctx.lineTo(x+40*scale, y+140*scale);
+			ctx.lineTo(x, y+100*scale);
+			ctx.lineTo(x, y);
+			ctx.stroke();
+			ctx.fill();
+		};		
+
+		// отрисовка горизонтального сегмента
+		drawHElement = function(ctx, x, y, on) {
+			ctx.strokeStyle = fade;
+			if (on)	ctx.fillStyle=color; else ctx.fillStyle=fade;
+			ctx.beginPath();
+			ctx.moveTo(x, y);
+			ctx.lineTo(x+k1, y-k1);
+			ctx.lineTo(x+k1*2, y);
+			ctx.lineTo(x+k1*2, y+k2);
+			ctx.lineTo(x+k1, y+k1+k2);
+			ctx.lineTo(x, y+k2);
+			ctx.lineTo(x, y);
+			ctx.stroke();
+			ctx.fill();
+		};
+
+		// отрисовка вертикального сегмента
+		drawVElement = function(ctx, x, y, on) {
+			ctx.strokeStyle = fade;
+			if (on)	ctx.fillStyle=color; else ctx.fillStyle=fade;
+			ctx.beginPath();
+			ctx.moveTo(x, y);
+			ctx.lineTo(x-k1, y+k1);     // /
+			ctx.lineTo(x, y+k1*2);      // \
+			ctx.lineTo(x+k2, y+k1*2);   // _
+			ctx.lineTo(x+k2+k1, y+k1);  // /
+			ctx.lineTo(x+k2, y);        // \
+			ctx.lineTo(x, y);           // _
+			ctx.stroke();
+			ctx.fill();
+		};
+
+		// отрисовка разделительных точек
+		drawDots = function(ctx, x, y, on) {
+			ctx.strokeStyle = fade;
+			if (on)	ctx.fillStyle=color; else ctx.fillStyle=fade;
+			ctx.beginPath();
+			ctx.arc(x+25*scale, y + 40*scale, 25*scale, 0, 2 * Math.PI);
+			ctx.stroke();
+			ctx.fill();
+			ctx.beginPath();
+			ctx.arc(x+25*scale, y + 190*scale, 25*scale, 0, 2 * Math.PI);
+			ctx.stroke();
+			ctx.fill();
+		};
+
+		// проверить не изменились ли размеры окна и если да, изменить коэффициент растяжения часов
+		checkAndResize = function() {
+			let wndHeight = Math.max(
+				document.body.scrollHeight, document.documentElement.scrollHeight,
+				document.body.offsetHeight, document.documentElement.offsetHeight,
+				document.body.clientHeight, document.documentElement.clientHeight
+				);
+
+			let wndWidth = document.documentElement.clientWidth;
+
+			if (currWidth != wndWidth)
+			{
+				currWidth = wndWidth;
+				
+				scale = currWidth / 860;
+				k1 = 20 * scale;
+				k2 = 100 * scale;
+
+				ctx = document.getElementById('clock');
+				ctx.width = currWidth - 5;
+				ctx.height = k2 * 2 + k1 * 6 + (5 * scale) * 5;
+
+				ctx.style.marginLeft = "-" + String(Math.trunc(ctx.width / 2)) + "px";
+				ctx.style.marginTop = "-" + String(Math.trunc(ctx.height / 2)) + "px";
+			}
+		};
+
+		window.onload = function() {
+			let timerId = setTimeout(function tick() {
+				let drawingCanvas = document.getElementById('clock');
+					if(drawingCanvas && drawingCanvas.getContext) {
+						var ctx = drawingCanvas.getContext('2d');
+
+						checkAndResize();
+
+						let curr = new Date();
+						if (curr != lastTime)
+						{
+							let h = curr.getHours();
+							let m = curr.getMinutes();
+							let x = 0;
+							let y = 0;
+							drawDigit(ctx, x, y, Math.trunc(h / 10));
+							drawDigit(ctx, x + 205*scale, y, h % 10);
+							drawDigit(ctx, x + 465*scale, y, Math.trunc(m / 10));
+							drawDigit(ctx, x + 665*scale, y, m % 10);
+
+							lastTime = curr;
+						};
+
+						drawDots(ctx, 405*scale, 50*scale, tickStatus);
+						tickStatus = !tickStatus;
+					}
+				timerId = setTimeout(tick, 1000); 
+				}, 1000);
+		}
+	</script>
+
+</body>

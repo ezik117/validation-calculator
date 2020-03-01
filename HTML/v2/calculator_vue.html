@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+		<meta charset="utf-8">
+		<script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+		<link rel="stylesheet" type="text/css" href="calculator_vue.css">
+</head>
+<body>
+	<div id="calc">
+		<div class="calc" style="float: left;">
+			<div>
+				<div class="display">{{A.value}}</div>
+				<br>
+				<div class="button noselect" @click="processKeys">7</div>
+				<div class="button noselect" @click="processKeys">8</div>
+				<div class="button noselect" @click="processKeys">9</div>
+				<div class="buttonFunc btn2 noselect" @click="clear()">C</div>
+				<div class="buttonFunc noselect" @click="processKeys">&lt;&lt;</div>
+				<div style="clear: both;"></div>
+				<div class="button noselect" @click="processKeys">4</div>
+				<div class="button noselect" @click="processKeys">5</div>
+				<div class="button noselect" @click="processKeys">6</div>
+				<div class="buttonOperation btn2 noselect" @click="processKeys">+</div>
+				<div class="buttonOperation noselect" @click="processKeys">*</div>
+				<div style="clear: both;"></div>
+				<div class="button noselect" @click="processKeys">1</div>
+				<div class="button noselect" @click="processKeys">2</div>
+				<div class="button noselect" @click="processKeys">3</div>
+				<div class="buttonOperation btn2 noselect" @click="processKeys">-</div>
+				<div class="buttonOperation noselect" @click="processKeys">/</div>
+				<div style="clear: both;"></div>
+				<div class="button noselect" @click="processKeys">0</div>
+				<div class="button noselect" @click="processKeys">.</div>
+				<div class="button noselect" @click="processKeys">+/-</div>
+				<div class="buttonFunc btn2 btn3 noselect" @click="processKeys">=</div>
+				<div style="clear: both;"></div>
+			</div>
+		</div>
+		
+		<div style="margin-left: 3em; float: left;">
+
+			<table border="1px">
+				<tr><td>регистр A</td><td style="color: blue;">{{this.A.value}}</td></tr>
+				<tr><td>регистр B</td><td style="color: blue;">{{this.B.value}}</td></tr>
+				<tr><td>регистр Z</td><td style="color: blue;">{{this.Z.value}}</td></tr>
+				<tr><td>операция</td><td style="color: blue;">{{this.OP}}</td></tr>
+				<tr><td>флаг EQ</td><td style="color: blue;">{{this.flags.EQ}}</td></tr>
+				<tr><td>флаг CONST</td><td style="color: blue;">{{this.flags.CONST}}</td></tr>
+				<tr><td>флаг CD</td><td style="color: blue;">{{this.flags.CD}}</td></tr>
+			</table>
+
+			<div id="history" style="color:green; padding-top: 1em; font-size: 80%;"></div>
+		</div>
+	</div>
+
+	<div style="clear: both; "></div>
+	
+
+<script>
+	/*var app = new Vue({
+		el: '#app',
+		data: {},
+		created: function() {},
+		methods: {},
+		computed: {}
+	});*/
+
+	// КЛАСС ДЛЯ РЕГИСТРА КАЛЬКУЛЯТОРА
+	class Regisry {
+		constructor(name) {
+			this.name = name;
+			this.value = "0";
+		}
+
+		clear() {
+			this.value = "0";
+		}
+
+		BS() {
+			if (this.value.length > 1)
+				this.value = this.value.slice(0,-1);
+			else
+				this.value = "0";
+		}
+
+		input(c, newInput) {
+			if ((this.value.length == 1 && this.value == "0") || newInput)
+				this.value = c;
+			else
+				this.value += c;
+		}
+
+		copyFrom(reg) {
+			this.value = reg.value;
+		}
+	};
+
+	// ОСНОВНОЙ КЛАСС КАЛЬКУЛЯТОРА
+	var calc = new Vue({
+		el: '#calc',
+		data: {
+			flags: {
+				CD: true,
+				CONST: false,
+				EQ: false
+			},
+			A: new Regisry("A"),
+			B: new Regisry('B'),
+			Z: new Regisry('Z'),
+			OP: null
+		},
+
+		created: function() {
+			document.addEventListener('keydown', function(event){
+				calc.processKeys(null, event.key);
+			} );
+		},
+
+		methods: {
+			clear: function() {
+				this.flags.CD = true;
+				this.flags.EQ = false;
+				this.flags.CONST = false;
+				this.A.clear();
+				this.B.clear();
+				this.Z.clear();
+				this.OP = null;
+			},
+
+			processKeys: function(event, key) {
+				let c = null;
+				if (key == undefined)
+					c = event.target.textContent;
+				else
+					c = key;
+
+				if ("0123456789.,".indexOf(c) >= 0)
+				{
+					if (c == ',') c = '.';
+					this.A.input(c, this.flags.CD);
+					this.flags.CD = false;
+				}
+				else if (c == '+/-' || (c == '-' && !this.flags.CD))
+				{
+					if (this.A.value.length > 0)
+					{
+						if (this.A.value[0] == '-')
+							this.A.value = this.A.value.slice(1);
+						else if (this.A.value[0] != '0')
+						this.A.value = '-' + this.A.value;
+					}
+				}
+				else if (c == '<<' || c == 'Backspace')
+				{
+					this.A.BS();
+				} 
+				else if (c == 'C' || c == 'Escape')
+				{
+					this.clear();
+				}
+				else if (c == '=' || c == 'Enter')
+				{
+					this.pressedEqual();
+				} else if ("+-/*".indexOf(c) >= 0)
+				{
+					this.pressedOpcode(c);
+				}
+			},
+
+			historyAppend: function(A, op, B, Z) {
+				let h = document.createElement('div');
+				h.textContent = A + " " + op + " " + B + " = " + Z;
+				let d = document.getElementById('history');
+				d.insertBefore(h, d.firstChild);
+			},
+
+			pressedOpcode: function(c) {
+				if (!this.flags.CD)
+					if (this.flags.CONST)
+						this.ALU(this.B, this.A);
+				this.B.copyFrom(this.A);
+				this.OP = c;
+				this.flags.CD = true;
+				this.flags.CONST = true;
+			},
+
+			pressedEqual: function() {
+				this.flags.EQ = true;
+				if (this.flags.CONST)
+					this.ALU(this.B, this.A);
+				else
+					this.ALU(this.A, this.B);
+
+				this.flags.CD = true;
+				this.flags.CONST = false;
+			},
+
+			ALU: function(A, B) {
+				if (this.OP == '+')
+					this.Z.value = String(parseFloat(A.value) + parseFloat(B.value));
+				else if (this.OP == '-')
+					this.Z.value = String(parseFloat(A.value) - parseFloat(B.value));
+				else if (this.OP == '/')
+					this.Z.value = String(parseFloat(A.value) / parseFloat(B.value));
+				else if (this.OP == '*')
+					this.Z.value = String(parseFloat(A.value) * parseFloat(B.value));
+				else
+					return;
+
+
+				if (this.flags.EQ && this.flags.CONST)
+				{
+					this.historyAppend(this.B.value, this.OP, this.A.value, this.Z.value);
+					this.B.copyFrom(this.A);
+					this.A.copyFrom(this.Z);
+				}
+				else if (this.flags.EQ && !this.flags.CONST)
+				{
+					this.historyAppend(this.A.value, this.OP, this.B.value, this.Z.value);
+					this.A.copyFrom(this.Z);
+				}
+				else if (!this.flags.EQ && this.flags.CONST)
+				{
+					this.historyAppend(this.B.value, this.OP, this.A.value, this.Z.value);
+					this.A.copyFrom(this.Z);
+					this.B.copyFrom(this.A);
+				}
+				else
+					throw "ALU: unknown flags combination";
+			}
+		},
+
+		computed: {}
+	});
+</script>
+
+</body>
+</html>
