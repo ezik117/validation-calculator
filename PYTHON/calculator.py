@@ -6,7 +6,8 @@
 # *****************************************************************************
 
 import msvcrt
-from registers import Regisry 
+from registers import Regisry
+import ALU
 
 
 class Flags:
@@ -41,11 +42,12 @@ class Calculator:
 	def __init__(self, mode:int=0):
 		self.A = Regisry('A') # регистр A
 		self.B = Regisry('B') # регистр B
-		self.Z = Regisry('Z') # симуляция регистра АЛУ
+		# NEWIT регистр Z теперь полностью принадлежит АЛУ, в калькуляторе его нет
 		self.OP = None        # текущее арифметическое действие
 		self.flags = Flags()  # флаги калькулятора
 		self.mode = mode      # включение/выключения отладочного режима
-
+		# NEWIT в АЛУ добавляем ссылку на флаги, но сам АЛУ их не изменеят
+		self.__ALU = ALU.ALU(self.flags) # инициализация АЛУ
 		print("press 'q' to exit, 0-9 to enter value, 'ESC'-to clear, 'ENTER' to evaluate")
 		self.displayRegisters()
 
@@ -53,7 +55,8 @@ class Calculator:
 	def clear(self):
 		self.A.clear()
 		self.B.clear()
-		self.Z.clear()
+		# NEWIT очищаем АЛУ (фактически только регистр Z на данном этапе)
+		self.__ALU.clear()
 		self.OP = None
 		self.flags.clear()
 
@@ -70,7 +73,7 @@ class Calculator:
 
 	# нажата цифровая клавиша. Ввод значения в регистр A
 	# IN: с - символ нажатой клавиши
-	def pressedDigitalKey(self, c:str):
+	def pressedDigitalKey(self, c: str):
 		if c == '\x08':
 			self.A.BS()
 		else:	
@@ -79,10 +82,11 @@ class Calculator:
 
 	# нажата арифметическая клавиша - обработаем
 	# IN: с - символ нажатой клавиши
-	def pressedOpcode(self, c:str):
+	def pressedOpcode(self, c: str):
 		if not self.flags.CD:
 			if self.flags.CONST:
-				self.ALU(self.B, self.A)
+				# NEWIT теперь обработка такокго вида:
+				self.__ALU.process(self.B, self.A, self.OP)
 		self.B.copyFrom(self.A)
 		self.OP = c
 		self.flags.CD = True
@@ -91,9 +95,11 @@ class Calculator:
 	# нажата клавиша "равно" - обработаем
 	def pressedEqual(self):
 		if self.flags.CONST:
-			self.ALU(self.B, self.A)
+			# NEWIT см. выше
+			self.__ALU.process(self.B, self.A, self.OP)
 		else:
-			self.ALU(self.A, self.B)
+			# NEWIT см. выше
+			self.__ALU.process(self.A, self.B, self.OP)
 
 		self.flags.CD = True
 		self.flags.CONST = False
@@ -126,29 +132,4 @@ class Calculator:
 
 				self.displayRegisters()
 
-	# АРИФМЕТИЧЕСКО-ЛОГИЧЕСКОЕ УСТРОЙСТВО (АЛУ)
-	# IN: A - ссылка на регистр A
-	# IN: B - ссылка на регистр B
-	def ALU(self, A:Regisry, B:Regisry):
-		if self.OP == '+':
-			self.Z.value = str(float(A.value) + float(B.value))
-		elif self.OP == '-':
-			self.Z.value = str(float(A.value) - float(B.value))
-		elif self.OP == '/':
-			self.Z.value = str(float(A.value) / float(B.value))
-		elif self.OP == '*':
-			self.Z.value = str(float(A.value) * float(B.value))
-		else:
-			return # нет операции
-
-		# выбор алгоритма вывода результатов
-		if self.flags.EQ and self.flags.CONST:
-			self.B.copyFrom(self.A) 
-			self.A.copyFrom(self.Z) 
-		elif self.flags.EQ and not self.flags.CONST:
-			self.A.copyFrom(self.Z)
-		elif not self.flags.EQ and self.flags.CONST:
-			self.A.copyFrom(self.Z)
-			self.B.copyFrom(self.A)
-		else:
-			raise Exception("ALU: unknown flags combination")
+# NEWIT АЛУ вынесен в отдельный класс
