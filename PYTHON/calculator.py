@@ -31,6 +31,10 @@ class Flags:
 		self.EQ = False
 
 
+# TODO реконструкция калькулятора
+# Реализация:
+# - [ ] добавить возможность ввода точки для дробных величин
+# - [ ] ??? нужен ли флаг введенной точки
 
 class Calculator:
 	""" ОСНОВНОЙ КЛАСС КАЛЬКУЛЯТОРА """
@@ -39,7 +43,7 @@ class Calculator:
 	#            0 - тестовый, отображение регистров и флагов. Каждая операция оставляет строку
 	#            1 - тестовый, отображение регистров и флагов как в 0, только одной строкой
 	#            2 - рабочий, отображает только дисплей калькулятора
-	def __init__(self, mode:int=0):
+	def __init__(self, mode: int=0):
 		self.A = Regisry('A') # регистр A
 		self.B = Regisry('B') # регистр B
 		# NEWIT регистр Z теперь полностью принадлежит АЛУ, в калькуляторе его нет
@@ -63,13 +67,13 @@ class Calculator:
 	# отобразить содержимое регистров в соответствии с выбранным режимом mode
 	def displayRegisters(self):
 		if self.mode == 0:
-			print(f"A='{self.A.value}'  ({self.OP})  B='{self.B.value}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}")
+			print(f"A='{self.A}'  ({self.OP})  B='{self.B}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}")
 		elif self.mode == 1:
 			print("\r" + " "*50, end='\r')
-			print(f"A='{self.A.value}'  ({self.OP})  B='{self.B.value}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}", end="\r")
+			print(f"A='{self.A}'  ({self.OP})  B='{self.B}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}", end="\r")
 		elif self.mode == 2:
 			print("\r" + " "*80, end="")
-			print("\r" + self.A.value, end='')
+			print("\r" + self.A, end='')
 
 	# нажата цифровая клавиша. Ввод значения в регистр A
 	# IN: с - символ нажатой клавиши
