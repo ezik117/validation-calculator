@@ -121,9 +121,9 @@ class Flags:
 # -------------------------------------------------------------------- #
 
 	def clear(self):
-	self.NEW_REG_FILLING
-	self.DISABLE_OPS_CONTINUES
-	self.EQUAL_NOT_PRESSED
+		self.NEW_REG_FILLING
+		self.DISABLE_OPS_CONTINUES
+		self.EQUAL_NOT_PRESSED
 
 
 # -------------------------- Тестовые методы ------------------------- #
@@ -132,4 +132,4 @@ class Flags:
 		return self.__CD, self.__CONST, self.__EQ
 	
 	def control(self):
-		return int(self.__CD), int(self.__CONST), int(self.__EQ)
+		return str(int(self.__EQ)) + str(int(self.__CONST)) + str(int(self.__CD))

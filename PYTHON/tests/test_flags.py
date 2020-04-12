@@ -1,5 +1,8 @@
 import pytest
-# from . import flags as fc
+import sys
+
+sys.path.append('..')
+from .. import flags as fc
 
 class TestFlags():
 
