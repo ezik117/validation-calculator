@@ -5,7 +5,7 @@
 # ОПИСАНИЕ:  Описывает класс фдагов калькулятора
 # *****************************************************************************
 
-
+# NEWIT изменен весь класс
 class Flags:
 	""" КЛАСС ДЛЯ ФЛАГОВ КАЛЬКУЛЯТОРА """
 
@@ -33,30 +33,31 @@ class Flags:
 
 # ------------------------ Временные свойства ------------------------ #
 
-	# Эти свойства необходимы для время перевода калькулятора на новый лкасс Flags
+	# Эти свойства необходимы для время перевода калькулятора на новый класс Flags
+	# NEWIT геттеры пока остаются для поддержки вывода на экран и в pytest
 	@property
 	def CD(self):
 		return self.__CD
 	
-	@CD.setter
-	def CD(self, val):
-		self.__CD = val
+	# @CD.setter
+	# def CD(self, val):
+	# 	self.__CD = val
 
 	@property
 	def CONST(self):
 		return self.__CONST
 	
-	@CONST.setter
-	def CONST(self, val):
-		self.__CONST = val
+	# @CONST.setter
+	# def CONST(self, val):
+	# 	self.__CONST = val
 	
 	@property
 	def EQ(self):
 		return self.__EQ
 	
-	@EQ.setter
-	def EQ(self, val):
-		self.__EQ = val
+	# @EQ.setter
+	# def EQ(self, val):
+	# 	self.__EQ = val
 
 # ------------------------------ Флаг CD ----------------------------- #
 

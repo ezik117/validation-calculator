@@ -41,7 +41,7 @@ class Regisry:
 		if self.name == 'Z':
 			self.__value = value
 		else:
-			raise ValueError
+			raise ValueError("Registry: unable to set value for registry '{}'".format(self.name))
 
 # --------------------------- Методы класса -------------------------- #
 
@@ -60,8 +60,12 @@ class Regisry:
 	# IN: c - цифра или точка в строковом представлении
 	# IN: newInput - если True, то содержимое регистра заменяется новым значением в 'c'
 	#              - если False, то значение в 'c' добавляется в конец значения регистра
-	def input(self, c: str, newInput: bool):
-		if (len(self.__value) == 1 and self.__value == "0") or (newInput):
+	# def input(self, c: str, newInput: bool):
+	# NEWIT передача объекта типа Flags
+	def input(self, c: str, flags: object):
+		# if (len(self.__value) == 1 and self.__value == "0") or (newInput):
+		# NEWIT замена вида флага
+		if (len(self.__value) == 1 and self.__value == "0") or flags.IS_NEW_INPUT:
 			self.__value = c
 		else:
 			self.__value += c

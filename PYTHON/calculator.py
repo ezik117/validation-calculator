@@ -23,14 +23,16 @@ class Calculator:
 	#            0 - тестовый, отображение регистров и флагов. Каждая операция оставляет строку
 	#            1 - тестовый, отображение регистров и флагов как в 0, только одной строкой
 	#            2 - рабочий, отображает только дисплей калькулятора
+	# NEWIT тестовый для pytest
+	#            3 - тестовый, отображение регистров и флагов, как в 0. Осуществляется возврат значения для pytest
 	def __init__(self, mode: int=0):
 		self.A = Regisry('A') # регистр A
 		self.B = Regisry('B') # регистр B
-		# NEWIT регистр Z теперь полностью принадлежит АЛУ, в калькуляторе его нет
+		# регистр Z теперь полностью принадлежит АЛУ, в калькуляторе его нет
 		self.OP = None        # текущее арифметическое действие
 		self.flags = flags.Flags()  # флаги калькулятора
 		self.mode = mode      # включение/выключения отладочного режима
-		# NEWIT в АЛУ добавляем ссылку на флаги, но сам АЛУ их не изменеят
+		# в АЛУ добавляем ссылку на флаги, но сам АЛУ их не изменеят
 		self.__ALU = ALU.ALU(self.flags) # инициализация АЛУ
 		print("press 'q' to exit, 0-9 to enter value, 'ESC'-to clear, 'ENTER' to evaluate")
 		self.displayRegisters()
@@ -39,9 +41,10 @@ class Calculator:
 	def clear(self):
 		self.A.clear()
 		self.B.clear()
-		# NEWIT очищаем АЛУ (фактически только регистр Z на данном этапе)
+		# очищаем АЛУ (фактически только регистр Z на данном этапе)
 		self.__ALU.clear()
 		self.OP = None
+		# NEWIT метод изменен во Flags
 		self.flags.clear()
 
 	# отобразить содержимое регистров в соответствии с выбранным режимом mode
@@ -54,7 +57,7 @@ class Calculator:
 		elif self.mode == 2:
 			print("\r" + " "*80, end="")
 			print("\r" + self.A, end='')
-		# Режим тестирования pytest
+		# NEWIT Режим тестирования pytest
 		elif self.mode == 3:
 			return f"A='{self.A}'  ({self.OP})  B='{self.B}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}"
 
@@ -64,57 +67,77 @@ class Calculator:
 		if c == '\x08':
 			self.A.BS()
 		else:	
-			self.A.input(c, self.flags.CD)
-			self.flags.CD = False
+			# self.A.input(c, self.flags.CD)
+			# NEWIT передача ссылки на весь объект теоретически даже менее затратна, чем передача отдельного флага
+			self.A.input(c, self.flags)
+			# self.flags.CD = False
+			# NEWIT замена вида флага
+			self.flags.ENABLE_REG_FILLING
 
 	# нажата арифметическая клавиша - обработаем
 	# IN: с - символ нажатой клавиши
 	def pressedOpcode(self, c: str):
-		if not self.flags.CD:
-			if self.flags.CONST:
-				# NEWIT теперь обработка такокго вида:
-				self.__ALU.process(self.B, self.A, self.OP)
+		# if not self.flags.CD:
+		# 	if self.flags.CONST:
+		# NEWIT замена вида флага
+		if self.flags.IS_OPERATON_POSSIBLE:
+			# теперь обработка такого вида:
+			self.__ALU.process(self.B, self.A, self.OP)
 		self.B.copyFrom(self.A)
 		self.OP = c
-		self.flags.CD = True
-		self.flags.CONST = True
+		# self.flags.CD = True
+		# NEWIT замена вида флага
+		self.flags.NEW_REG_FILLING
+		# self.flags.CONST = True
+		# NEWIT замена вида флага
+		self.flags.ENABLE_OPS_CONTINUES
 
 	# нажата клавиша "равно" - обработаем
 	def pressedEqual(self):
-		if self.flags.CONST:
-			# NEWIT см. выше
+		# if self.flags.CONST:
+		# NEWIT замена вида флага
+		if self.flags.IS_OPS_CONTINUES:
 			self.__ALU.process(self.B, self.A, self.OP)
 		else:
-			# NEWIT см. выше
 			self.__ALU.process(self.A, self.B, self.OP)
 
-		self.flags.CD = True
-		self.flags.CONST = False
+		# self.flags.CD = True
+		# NEWIT замена вида флага
+		self.flags.NEW_REG_FILLING
+		# self.flags.CONST = False
+		# NEWIT замена вида флага
+		self.flags.DISABLE_OPS_CONTINUES
 
 	# цикл обработки нажатия клавиш с клавиатуры
 	def processKeys(self):
 		while (True):
 			if msvcrt.kbhit():
 				c = msvcrt.getch().decode()
-				
+
 				# quit
 				if c == 'q':
 					break
 
 				# digital keys
 				if ('0' <= c <= '9') or (c == '\x08'):
-					self.flags.EQ = False
+					# self.flags.EQ = False
+					# NEWIT замена вида флага
+					self.flags.EQUAL_NOT_PRESSED
 					self.pressedDigitalKey(c)
 				# reset key
 				elif c == '\x1B':
 					self.clear()
 				# opcode keys
 				elif c in ['+', '-', '*', '/']:
-					self.flags.EQ = False
+					# self.flags.EQ = False
+					# NEWIT замена вида флага
+					self.flags.EQUAL_NOT_PRESSED
 					self.pressedOpcode(c)
 				# equal key
 				elif c == '\x0D':
-					self.flags.EQ = True
+					# self.flags.EQ = True
+					# NEWIT замена вида флага
+					self.flags.EQUAL_PRESSED
 					self.pressedEqual()
 
 				self.displayRegisters()
