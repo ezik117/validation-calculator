@@ -31,6 +31,33 @@ class Flags:
 #                               Свойства                               #
 # -------------------------------------------------------------------- #
 
+# ------------------------ Временные свойства ------------------------ #
+
+	# Эти свойства необходимы для время перевода калькулятора на новый лкасс Flags
+	@property
+	def CD(self):
+		return self.__CD
+	
+	@CD.setter
+	def CD(self, val):
+		self.__CD = val
+
+	@property
+	def CONST(self):
+		return self.__CONST
+	
+	@CONST.setter
+	def CONST(self, val):
+		self.__CONST = val
+	
+	@property
+	def EQ(self):
+		return self.__EQ
+	
+	@EQ.setter
+	def EQ(self, val):
+		self.__EQ = val
+
 # ------------------------------ Флаг CD ----------------------------- #
 
 	# Заполняем текущий регистр А ?

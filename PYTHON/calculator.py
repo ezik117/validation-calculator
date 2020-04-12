@@ -54,6 +54,9 @@ class Calculator:
 		elif self.mode == 2:
 			print("\r" + " "*80, end="")
 			print("\r" + self.A, end='')
+		# Режим тестирования pytest
+		elif self.mode == 3:
+			return f"A='{self.A}'  ({self.OP})  B='{self.B}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}"
 
 	# нажата цифровая клавиша. Ввод значения в регистр A
 	# IN: с - символ нажатой клавиши
@@ -93,7 +96,7 @@ class Calculator:
 		while (True):
 			if msvcrt.kbhit():
 				c = msvcrt.getch().decode()
-
+				
 				# quit
 				if c == 'q':
 					break

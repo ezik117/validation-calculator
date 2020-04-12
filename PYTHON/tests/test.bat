@@ -1,1 +1,1 @@
-pytest -v test_flags.py
+pytest -v test_calculator.py
