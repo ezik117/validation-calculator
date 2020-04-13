@@ -56,10 +56,15 @@ class Regisry:
 	# сброс содержимого регистра
 	def clear(self):
 		self.__value = '0'
+		# NEWIT сброс флага запятой при очистке
+		self.__comma = False
 
 	# затереть один символ с конца
 	def BS(self):
 		if len(self.__value) > 1:
+			# NEWIT сброс флага запятой, если она затерта
+			if self.__value[-1] == '.':
+				self.__comma = False
 			self.__value = self.__value[:-1]
 		else:
 			self.__value = '0'
@@ -69,11 +74,14 @@ class Regisry:
 	# IN: newInput - если True, то содержимое регистра заменяется новым значением в 'c'
 	#              - если False, то значение в 'c' добавляется в конец значения регистра
 	def input(self, c: str, flags: object):
-		# NEWIT защита от ввода второй запятой (самая затратная операция - последняя;
-		# выполняется только в случае ввода точки и продолжающегося заполнения регистра)
-		if c == '.' and flags.IS_REG_FILLING and '.' in self.__value:
+		# NEWIT Если новый ввод, то сброс флага запятой
+		if flags.IS_NEW_INPUT: self.__comma = False
+		# NEWIT защита от ввода второй запятой
+		# if c == '.' and flags.IS_REG_FILLING and '.' in self.__value:
+		if c == '.' and flags.IS_REG_FILLING and self.__comma:
 			raise ValueError("could not convert string to float: '{0}'".format(self.__value + c))
-
+		# NEWIT поднятие флага запятой, если введена запятая
+		if c == '.': self.__comma = True
 		if (len(self.__value) == 1 and self.__value == "0") or flags.IS_NEW_INPUT:
 			self.__value = c
 		else:
@@ -82,6 +90,8 @@ class Regisry:
 	# копирует значение из другого регистра класса Regisry
 	def copyFrom(self, R:'Regisry'):
 		self.__value = R.value
+		# NEWIT копирование флага запятой
+		self.__comma = R.__comma
 
 # ------------------------ Специальные методы ------------------------ #
 

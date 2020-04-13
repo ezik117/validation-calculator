@@ -55,8 +55,10 @@ class Calculator:
 		elif self.mode == 2:
 			print("\r" + " "*80, end="")
 			print("\r" + self.A, end='')
+		# NEWIT изменился вид вывода (для возможности добавления новых значений)
 		elif self.mode == 3:
-			return f"A='{self.A}'  ({self.OP})  B='{self.B}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}"
+			return (f"A='{self.A}'  ({self.OP})  B='{self.B}'"
+				f"  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}")
 
 	# нажата цифровая клавиша. Ввод значения в регистр A
 	# IN: с - символ нажатой клавиши

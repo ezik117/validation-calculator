@@ -51,6 +51,7 @@ class TestFlags():
 
 	# проверка ввода операции после ввода первого числа
 	# ввод второго числа
+	# @pytest.mark.skip()
 	def test_input_first_op(self):
 		calc = self.test_BS()
 		calc.pressedOpcode('+')
@@ -65,6 +66,7 @@ class TestFlags():
 		return calc
 
 	# нажатие равно
+	# @pytest.mark.skip()
 	def test_press_equal(self):
 		calc = self.test_input_first_op()
 		calc.pressedEqual()
@@ -73,6 +75,7 @@ class TestFlags():
 
 	# проверка ввода операции после ввода первого числа
 	# ввод второго числа, затем продолжающийся ввод операций (и "равно" в конце)
+	# @pytest.mark.skip()
 	def test_continuos_ops(self):
 		calc = self.test_input_first_op()
 		calc.pressedOpcode('-')
@@ -92,6 +95,7 @@ class TestFlags():
                     "  EQ=1  CD=1  CONST=0") == calc.displayRegisters()
 
 	# последовательный ввод "равно" после ввода 2 чисел и одной операции
+	# @pytest.mark.skip()
 	def test_continuos_equal(self):
 		calc = self.test_press_equal()
 		calc.pressedEqual()
@@ -103,13 +107,16 @@ class TestFlags():
 		return calc
 
 	# тест нажатия клавиши ESC "очистка"
+	# @pytest.mark.skip()
 	def test_escape_clear(self):
 		calc = self.test_continuos_equal()
 		calc.clear()
 		assert "A='0'  (None)  B='0'  EQ=0  CD=1  CONST=0" == calc.displayRegisters()
+		# WARNING нет проверки очистки запятой
 		return calc
 
 	# тест ошибки при вводе второй запятой
+	# @pytest.mark.skip()
 	def test_input_two_comma_raises(self):
 		calc = self.test_escape_clear()
 		calc.pressedDigitalKey('1')
