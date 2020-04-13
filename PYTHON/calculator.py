@@ -64,6 +64,7 @@ class Calculator:
 	# нажата цифровая клавиша. Ввод значения в регистр A
 	# IN: с - символ нажатой клавиши
 	def pressedDigitalKey(self, c: str):
+		self.flags.EQUAL_NOT_PRESSED
 		if c == '\x08':
 			self.A.BS()
 		else:	
@@ -77,6 +78,7 @@ class Calculator:
 	# нажата арифметическая клавиша - обработаем
 	# IN: с - символ нажатой клавиши
 	def pressedOpcode(self, c: str):
+		self.flags.EQUAL_NOT_PRESSED
 		# if not self.flags.CD:
 		# 	if self.flags.CONST:
 		# NEWIT замена вида флага
@@ -94,6 +96,7 @@ class Calculator:
 
 	# нажата клавиша "равно" - обработаем
 	def pressedEqual(self):
+		self.flags.EQUAL_PRESSED
 		# if self.flags.CONST:
 		# NEWIT замена вида флага
 		if self.flags.IS_OPS_CONTINUES:
@@ -122,7 +125,7 @@ class Calculator:
 				if ('0' <= c <= '9') or (c == '\x08'):
 					# self.flags.EQ = False
 					# NEWIT замена вида флага
-					self.flags.EQUAL_NOT_PRESSED
+					# self.flags.EQUAL_NOT_PRESSED
 					self.pressedDigitalKey(c)
 				# reset key
 				elif c == '\x1B':
@@ -131,13 +134,13 @@ class Calculator:
 				elif c in ['+', '-', '*', '/']:
 					# self.flags.EQ = False
 					# NEWIT замена вида флага
-					self.flags.EQUAL_NOT_PRESSED
+					# self.flags.EQUAL_NOT_PRESSED
 					self.pressedOpcode(c)
 				# equal key
 				elif c == '\x0D':
 					# self.flags.EQ = True
 					# NEWIT замена вида флага
-					self.flags.EQUAL_PRESSED
+					# self.flags.EQUAL_PRESSED
 					self.pressedEqual()
 
 				self.displayRegisters()
