@@ -31,19 +31,16 @@ class ALU:
 
 		# выбор алгоритма вывода результатов
 		# если нажата "равно" и операция не завершена
-		# if self.__flags.EQ and self.__flags.CONST:
 		if self.__flags.IS_B_op_A:
 			# копируем из А в В
 			B.copyFrom(A)
 			# копируем из Z в А
 			A.copyFrom(self.__Z)
 		# если нажата "равно" и операция завершена
-		# elif self.__flags.EQ and not self.__flags.CONST:
 		elif self.__flags.IS_A_op_B:
 			# копируем из Z в А
 			A.copyFrom(self.__Z)
 		# если НЕ "равно" и операция не завершена
-		# elif not self.__flags.EQ and self.__flags.CONST:
 		elif self.__flags.IS_NEXT_OPERATION:
 			# копируем из Z в А
 			A.copyFrom(self.__Z)

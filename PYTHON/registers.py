@@ -26,8 +26,9 @@ class Regisry:
 	# IN: name - буква регистра, необходима для избежания получения одинаковой ссылки на
 	#            разные объекты
 	# IN: base - ссылка на базовый класс калькулятора для 
-	def __init__(self, name:str):
-		self.name = name  # буква регистра
+	def __init__(self, name: str):
+		# NEWIT закрыть изменение имени регистра извне
+		self.__name = name  # буква регистра
 		self.__value = '0'  # значение регистра как строка
 
 # -------------------------- Свойства класса ------------------------- #
@@ -38,7 +39,7 @@ class Regisry:
 
 	@value.setter
 	def value(self, value):
-		if self.name == 'Z':
+		if self.__name == 'Z':
 			self.__value = value
 		else:
 			raise ValueError("Registry: unable to set value for registry '{}'".format(self.name))
@@ -60,11 +61,7 @@ class Regisry:
 	# IN: c - цифра или точка в строковом представлении
 	# IN: newInput - если True, то содержимое регистра заменяется новым значением в 'c'
 	#              - если False, то значение в 'c' добавляется в конец значения регистра
-	# def input(self, c: str, newInput: bool):
-	# NEWIT передача объекта типа Flags
 	def input(self, c: str, flags: object):
-		# if (len(self.__value) == 1 and self.__value == "0") or (newInput):
-		# NEWIT замена вида флага
 		if (len(self.__value) == 1 and self.__value == "0") or flags.IS_NEW_INPUT:
 			self.__value = c
 		else:
