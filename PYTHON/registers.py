@@ -19,8 +19,11 @@
 # - [-] разделить хранение целой и дробной частей, т.к. невозможно работать с типом float без потери точности
 # - [ ] ??? добавить свойства получения длин каждой части (необходимо для дальнейших расчетов)
 # - [x] исправить метод input() для возможности ввода дробных величин
-# - [ ] ??? ограничение ввода незначащих нулей для дробной части
-
+# - [x] ??? ограничение ввода незначащих нулей для дробной части
+# ------------
+# Реализация 2:
+# 1) Узнать длину каждой части через find ?
+# 2) Запомнить их в свойствах
 
 class Regisry:
 	""" КЛАСС ДЛЯ РЕГИСТРА КАЛЬКУЛЯТОРА """
@@ -35,6 +38,9 @@ class Regisry:
 		self.__value = '0'  # значение регистра как строка
 		# NEWIT флаг ввода точки
 		self.__comma = False # событие ввода точки
+		# Длины каждой части
+		self.__len_int = 0
+		self.__len_frac = 0
 
 # -------------------------- Свойства класса ------------------------- #
 
@@ -49,7 +55,19 @@ class Regisry:
 		if self.__name == 'Z':
 			self.__value = value
 		else:
-			raise ValueError("Registry: unable to set value for registry '{}'".format(self.name))
+			raise ValueError("Registry: unable to set value for registry '{}'".format(self.__name))
+
+	# TODO можно удалить в будущем (для тестов)
+	@property
+	def comma(self):
+		return int(self.__comma)
+
+	@comma.setter
+	def comma(self, value):
+		if self.__name == 'Z':
+			self.__comma = value
+		else:
+			raise ValueError("Registry: unable to set value for registry '{}'".format(self.__name))
 
 # --------------------------- Методы класса -------------------------- #
 
@@ -58,6 +76,8 @@ class Regisry:
 		self.__value = '0'
 		# NEWIT сброс флага запятой при очистке
 		self.__comma = False
+		self.__len_int = 0
+		self.__len_frac = 0
 
 	# затереть один символ с конца
 	def BS(self):
@@ -92,6 +112,26 @@ class Regisry:
 		self.__value = R.value
 		# NEWIT копирование флага запятой
 		self.__comma = R.__comma
+		# TODO нужно будет копировать длины частей
+		self.__len_int = R.__len_int
+		self.__len_frac = R.__len_frac
+
+	# NEWIT Работа метода:
+	# 1) удаление незначащих нулей дробной части
+	# 2) определение длин целой и дробной частей
+	# TODO не протестировано в pytest
+	def prepare(self):
+		if self.__comma:
+			self.__value = self.__value.rstrip('0')
+			if self.__value.endswith('.'):
+				self.__value += '0'
+			self.__len_int = self.__value.find('.')
+			self.__len_frac = len(self.__value) - self.__len_int - 1
+		else:
+			self.__len_int = len(self.__value)
+			self.__len_frac = 0
+		# print(self.__len_int, self.__len_frac)
+
 
 # ------------------------ Специальные методы ------------------------ #
 

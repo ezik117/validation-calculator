@@ -49,7 +49,7 @@ class Calculator:
 	# отобразить содержимое регистров в соответствии с выбранным режимом mode
 	def displayRegisters(self):
 		if self.mode == 0:
-			print(f"A='{self.A}'  ({self.OP})  B='{self.B}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}")
+			print(f"A='{self.A}'  ({self.OP})  B='{self.B}'  Z='{self.__ALU.Z}'  CommaZ={self.__ALU.Z.comma}  CommaA={self.A.comma}  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}")
 		elif self.mode == 1:
 			print("\r" + " "*50, end='\r')
 			print(f"A='{self.A}'  ({self.OP})  B='{self.B}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}", end="\r")
@@ -75,6 +75,7 @@ class Calculator:
 	# IN: с - символ нажатой клавиши
 	def pressedOpcode(self, c: str):
 		self.flags.EQUAL_NOT_PRESSED
+		self.A.prepare()
 		if self.flags.IS_OPERATON_POSSIBLE:
 			self.__ALU.process(self.B, self.A, self.OP)
 		self.B.copyFrom(self.A)
@@ -85,11 +86,12 @@ class Calculator:
 	# нажата клавиша "равно" - обработаем
 	def pressedEqual(self):
 		self.flags.EQUAL_PRESSED
+		self.A.prepare()
 		if self.flags.IS_OPS_CONTINUES:
 			self.__ALU.process(self.B, self.A, self.OP)
 		else:
 			self.__ALU.process(self.A, self.B, self.OP)
-
+		# self.A.prepare()
 		self.flags.NEW_REG_FILLING
 		self.flags.DISABLE_OPS_CONTINUES
 
