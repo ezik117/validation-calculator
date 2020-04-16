@@ -6,7 +6,7 @@
 # *****************************************************************************
 
 import msvcrt
-from registers import Regisry
+from registers import Registry
 import flags
 import ALU
 
@@ -26,8 +26,8 @@ class Calculator:
 	#            2 - рабочий, отображает только дисплей калькулятора
 	#            3 - тестовый, отображение регистров и флагов, как в 0. Осуществляется возврат значения для pytest
 	def __init__(self, mode: int=0):
-		self.A = Regisry('A') # регистр A
-		self.B = Regisry('B') # регистр B
+		self.A = Registry('A') # регистр A
+		self.B = Registry('B') # регистр B
 		# регистр Z теперь полностью принадлежит АЛУ, в калькуляторе его нет
 		self.OP = None        # текущее арифметическое действие
 		self.flags = flags.Flags()  # флаги калькулятора
@@ -77,7 +77,7 @@ class Calculator:
 		self.flags.EQUAL_NOT_PRESSED
 		self.A.prepare()
 		if self.flags.IS_OPERATON_POSSIBLE:
-			self.__ALU.process(self.B, self.A, self.OP)
+			self.__ALU.process(self.B, self.A, self.OP, self.flags)
 		self.B.copyFrom(self.A)
 		self.OP = c
 		self.flags.NEW_REG_FILLING
@@ -88,9 +88,9 @@ class Calculator:
 		self.flags.EQUAL_PRESSED
 		self.A.prepare()
 		if self.flags.IS_OPS_CONTINUES:
-			self.__ALU.process(self.B, self.A, self.OP)
+			self.__ALU.process(self.B, self.A, self.OP, self.flags)
 		else:
-			self.__ALU.process(self.A, self.B, self.OP)
+			self.__ALU.process(self.A, self.B, self.OP, self.flags)
 		# self.A.prepare()
 		self.flags.NEW_REG_FILLING
 		self.flags.DISABLE_OPS_CONTINUES

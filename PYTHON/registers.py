@@ -25,7 +25,7 @@
 # 1) Узнать длину каждой части через find ?
 # 2) Запомнить их в свойствах
 
-class Regisry:
+class Registry:
 	""" КЛАСС ДЛЯ РЕГИСТРА КАЛЬКУЛЯТОРА """
 	# конструктор
 	# IN: name - буква регистра, необходима для избежания получения одинаковой ссылки на
@@ -69,6 +69,15 @@ class Regisry:
 		else:
 			raise ValueError("Registry: unable to set value for registry '{}'".format(self.__name))
 
+	# NEWIT Длины частей
+	@property
+	def len_int(self):
+		return self.__len_int
+
+	@property
+	def len_frac(self):
+		return self.__len_frac
+
 # --------------------------- Методы класса -------------------------- #
 
 	# сброс содержимого регистра
@@ -107,8 +116,8 @@ class Regisry:
 		else:
 			self.__value += c
 
-	# копирует значение из другого регистра класса Regisry
-	def copyFrom(self, R:'Regisry'):
+	# копирует значение из другого регистра класса Registry
+	def copyFrom(self, R:'Registry'):
 		self.__value = R.value
 		# NEWIT копирование флага запятой
 		self.__comma = R.__comma
@@ -129,9 +138,32 @@ class Regisry:
 			self.__len_frac = len(self.__value) - self.__len_int - 1
 		else:
 			self.__len_int = len(self.__value)
-			self.__len_frac = 0
+			# TODO тест ответа всегда с запятой
+			# self.__len_frac = 0
+			self.__len_frac = 1
+			self.__value += '.0'
 		# print(self.__len_int, self.__len_frac)
 
+	# NEWIT Генератор, извлекающий по 1 цифре из строки числа,
+	# скорректированный на длину максимального числа
+	# IN: max_int - максимальная длина целой части числа из двух
+	# IN: max_frac - максимальная длина дробной части числа из двух
+	def extract(self, max_int: int=0, max_frac: int=0):
+		# Начинаем с конца
+		# 1) коррекция дробной части (len_frac либо равна, либо меньше max_frac)
+		for _ in range(max_frac - self.__len_frac):
+			yield 0
+		# 2) генерирование дробной части, затем целой, пропуская точку (с конца)
+		for idx in range(len(self.__value)-1, -1, -1):
+			if idx > self.__len_int:
+				yield int(self.__value[idx])
+			elif idx == self.__len_int:
+				yield None
+			else:
+				yield int(self.__value[idx])
+		# 3) коррекция целой части (аналогично дробной (1))
+		for _ in range(max_int - self.__len_int):
+			yield 0
 
 # ------------------------ Специальные методы ------------------------ #
 

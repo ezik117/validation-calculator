@@ -1,5 +1,5 @@
 
-from registers import Regisry
+from registers import Registry
 
 # TODO реконструкция ALU
 # Причины:
@@ -16,7 +16,7 @@ class ALU:
 
 	def __init__(self, flags: object):
 		self.__flags = flags
-		self.__Z = Regisry('Z')  # симуляция регистра АЛУ
+		self.__Z = Registry('Z')  # симуляция регистра АЛУ
 
 
 	# TODO удалить
@@ -31,9 +31,16 @@ class ALU:
 
 	# IN: A - ссылка на регистр A
 	# IN: B - ссылка на регистр B
-	def process(self, A: Regisry, B: Regisry, op: str):
+	def process(self, A: Registry, B: Registry, op: str, flags):
 		if op == '+':
-			self.__Z.value = str(float(A.value) + float(B.value))
+			# self.__Z.value = str(float(A.value) + float(B.value))
+			# self.__Z.value = self.add(A, B)
+			# TODO создать сборку через input ?
+			# self.__Z.clear()
+			self.__Z.value = ''
+			for digit in self.add(A, B):
+				# self.__Z.input(digit, flags)
+				self.__Z.value = digit + self.__Z.value
 		elif op == '-':
 			self.__Z.value = str(float(A.value) - float(B.value))
 		elif op == '/':
@@ -66,3 +73,27 @@ class ALU:
 		# в любом другом случае (нажато НЕ "равно" и операция завершилась)
 		else:
 			raise Exception("ALU: unknown flags combination")
+
+	# NEWIT генератор сложения (генерирует сбор строки числа)
+	# IN: A - объект первого числа
+	# IN: B - объект второго числа
+	def add(self, A: Registry, B: Registry):
+		# Вначале нужно найти максимально длинную часть
+		max_len_int = max(A.len_int, B.len_int)
+		max_len_frac = max(A.len_frac, B.len_frac)
+		carry = 0
+		# Генератор результата суммы
+		for x, y in zip(A.extract(max_len_int, max_len_frac),
+						B.extract(max_len_int, max_len_frac)):
+			# Если попалась точка дробной части
+			if x is None and y is None:
+				yield '.'
+			else:
+				sum = str(x + y + carry)
+				carry = 0
+				# если результат сложения с переносом
+				if len(sum) == 2:
+					carry, sum = 1, sum[1]
+				yield sum
+		if carry:
+			yield '1'
