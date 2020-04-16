@@ -84,6 +84,7 @@ class TestFlags():
 		assert "A='1'  (-)  B='66.52'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
 		calc.pressedDigitalKey('0')
 		assert "A='10'  (-)  B='66.52'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
+		# Дроби портятся пока нереализованной операцией "-"
 		calc.pressedOpcode('+')
 		assert ("A='56.519999999999996'  (+)  B='56.519999999999996'"
 					"  EQ=0  CD=1  CONST=1") == calc.displayRegisters()
@@ -99,11 +100,11 @@ class TestFlags():
 	def test_continuos_equal(self):
 		calc = self.test_press_equal()
 		calc.pressedEqual()
-		assert "A='120.91999999999999'  (+)  B='66.52'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='120.92'  (+)  B='66.52'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		calc.pressedEqual()
 		assert "A='187.44'  (+)  B='66.52'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		calc.pressedEqual()
-		assert "A='253.95999999999998'  (+)  B='66.52'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='253.96'  (+)  B='66.52'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		return calc
 
 	# тест нажатия клавиши ESC "очистка"

@@ -44,18 +44,18 @@ class TestFlags():
 	def test_input_first_op(self):
 		calc = self.test_BS()
 		calc.pressedOpcode('+')
-		assert "A='54'  (+)  B='54'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
+		assert "A='54.0'  (+)  B='54.0'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
 		calc.pressedDigitalKey('1')
-		assert "A='1'  (+)  B='54'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
+		assert "A='1'  (+)  B='54.0'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
 		calc.pressedDigitalKey('2')
-		assert "A='12'  (+)  B='54'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
+		assert "A='12'  (+)  B='54.0'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
 		return calc
 
 	# нажатие равно
 	def test_press_equal(self):
 		calc = self.test_input_first_op()
 		calc.pressedEqual()
-		assert "A='54'  (+)  B='66.0'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='54.0'  (+)  B='66.0'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		return calc
 
 	# проверка ввода операции после ввода первого числа
