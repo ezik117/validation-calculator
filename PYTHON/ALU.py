@@ -31,7 +31,7 @@ class ALU:
 
 	# IN: A - ссылка на регистр A
 	# IN: B - ссылка на регистр B
-	def process(self, A: Registry, B: Registry, op: str, flags):
+	def process(self, A: Registry, B: Registry, op: str):
 		if op == '+':
 			# self.__Z.value = str(float(A.value) + float(B.value))
 			# self.__Z.value = self.add(A, B)

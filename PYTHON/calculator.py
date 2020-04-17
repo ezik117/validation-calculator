@@ -77,7 +77,7 @@ class Calculator:
 		self.flags.EQUAL_NOT_PRESSED
 		self.A.prepare()
 		if self.flags.IS_OPERATON_POSSIBLE:
-			self.__ALU.process(self.B, self.A, self.OP, self.flags)
+			self.__ALU.process(self.B, self.A, self.OP)
 		self.B.copyFrom(self.A)
 		self.OP = c
 		self.flags.NEW_REG_FILLING
@@ -88,9 +88,9 @@ class Calculator:
 		self.flags.EQUAL_PRESSED
 		self.A.prepare()
 		if self.flags.IS_OPS_CONTINUES:
-			self.__ALU.process(self.B, self.A, self.OP, self.flags)
+			self.__ALU.process(self.B, self.A, self.OP)
 		else:
-			self.__ALU.process(self.A, self.B, self.OP, self.flags)
+			self.__ALU.process(self.A, self.B, self.OP)
 		# self.A.prepare()
 		self.flags.NEW_REG_FILLING
 		self.flags.DISABLE_OPS_CONTINUES
