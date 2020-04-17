@@ -1,1 +1,1 @@
-pytest -v test_calc_float.py
+pytest -v test_calc_alu_add.py

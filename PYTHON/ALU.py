@@ -1,5 +1,6 @@
+import pdb
 
-from registers import Registry
+from registers import Registry, RegistryZ
 
 # TODO реконструкция ALU
 # Причины:
@@ -16,7 +17,7 @@ class ALU:
 
 	def __init__(self, flags: object):
 		self.__flags = flags
-		self.__Z = Registry('Z')  # симуляция регистра АЛУ
+		self.__Z = RegistryZ('Z')  # симуляция регистра АЛУ
 
 
 	# TODO удалить
@@ -32,15 +33,21 @@ class ALU:
 	# IN: A - ссылка на регистр A
 	# IN: B - ссылка на регистр B
 	def process(self, A: Registry, B: Registry, op: str):
+		# FIXME неправильно работает при нажатии равно
+		# BUG 1 - в prepare добавлялось ".0", но флаг запятой не изменялся
+		# BUG 2 - input в Z изменял слишком много
 		if op == '+':
 			# self.__Z.value = str(float(A.value) + float(B.value))
 			# self.__Z.value = self.add(A, B)
 			# TODO создать сборку через input ?
 			# self.__Z.clear()
 			self.__Z.value = ''
+			self.__Z.comma = False
+			print(self.__flags.control())
+			self.__Z.input('new', self.__flags, A, B, op)
 			for digit in self.add(A, B):
-				# self.__Z.input(digit, flags)
-				self.__Z.value = digit + self.__Z.value
+				self.__Z.input(digit, self.__flags, A, B, op)
+				# self.__Z.value = digit + self.__Z.value
 		elif op == '-':
 			self.__Z.value = str(float(A.value) - float(B.value))
 		elif op == '/':
@@ -55,6 +62,9 @@ class ALU:
 		self.__Z.prepare()
 		# выбор алгоритма вывода результатов
 		# если нажата "равно" и операция не завершена
+		# pdb.set_trace()
+		# pdb.pm()
+		# pdb.post_mortem()
 		if self.__flags.IS_B_op_A:
 			# копируем из А в В
 			B.copyFrom(A)

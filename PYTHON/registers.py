@@ -35,9 +35,9 @@ class Registry:
 		# NEWIT закрыть изменение имени регистра извне
 		self.__name = name  # буква регистра
 		# NEWIT закрыть изменение значения регистра извне напрямую (кроме регистра Z)
-		self.__value = '0'  # значение регистра как строка
+		self._value = '0'  # значение регистра как строка
 		# NEWIT флаг ввода точки
-		self.__comma = False # событие ввода точки
+		self._comma = False # событие ввода точки
 		# Длины каждой части
 		self.__len_int = 0
 		self.__len_frac = 0
@@ -47,25 +47,25 @@ class Registry:
 	# NEWIT getter значения регистра
 	@property
 	def value(self):
-		return self.__value
+		return self._value
 
 	# NEWIT setter регистра Z
 	@value.setter
 	def value(self, value):
 		if self.__name == 'Z':
-			self.__value = value
+			self._value = value
 		else:
 			raise ValueError("Registry: unable to set value for registry '{}'".format(self.__name))
 
 	# TODO можно удалить в будущем (для тестов)
 	@property
 	def comma(self):
-		return int(self.__comma)
+		return int(self._comma)
 
 	@comma.setter
 	def comma(self, value):
 		if self.__name == 'Z':
-			self.__comma = value
+			self._comma = value
 		else:
 			raise ValueError("Registry: unable to set value for registry '{}'".format(self.__name))
 
@@ -82,21 +82,21 @@ class Registry:
 
 	# сброс содержимого регистра
 	def clear(self):
-		self.__value = '0'
+		self._value = '0'
 		# NEWIT сброс флага запятой при очистке
-		self.__comma = False
+		self._comma = False
 		self.__len_int = 0
 		self.__len_frac = 0
 
 	# затереть один символ с конца
 	def BS(self):
-		if len(self.__value) > 1:
+		if len(self._value) > 1:
 			# NEWIT сброс флага запятой, если она затерта
-			if self.__value[-1] == '.':
-				self.__comma = False
-			self.__value = self.__value[:-1]
+			if self._value[-1] == '.':
+				self._comma = False
+			self._value = self._value[:-1]
 		else:
-			self.__value = '0'
+			self._value = '0'
 
 	# ввести один символ в конец
 	# IN: c - цифра или точка в строковом представлении
@@ -104,23 +104,23 @@ class Registry:
 	#              - если False, то значение в 'c' добавляется в конец значения регистра
 	def input(self, c: str, flags: object):
 		# NEWIT Если новый ввод, то сброс флага запятой
-		if flags.IS_NEW_INPUT: self.__comma = False
+		if flags.IS_NEW_INPUT: self._comma = False
 		# NEWIT защита от ввода второй запятой
-		# if c == '.' and flags.IS_REG_FILLING and '.' in self.__value:
-		if c == '.' and flags.IS_REG_FILLING and self.__comma:
-			raise ValueError("could not convert string to float: '{0}'".format(self.__value + c))
+		# if c == '.' and flags.IS_REG_FILLING and '.' in self._value:
+		if c == '.' and flags.IS_REG_FILLING and self._comma:
+			raise ValueError("could not convert string to float: '{0}'".format(self._value + c))
 		# NEWIT поднятие флага запятой, если введена запятая
-		if c == '.': self.__comma = True
-		if (len(self.__value) == 1 and self.__value == "0") or flags.IS_NEW_INPUT:
-			self.__value = c
+		if c == '.': self._comma = True
+		if (len(self._value) == 1 and self._value == "0") or flags.IS_NEW_INPUT:
+			self._value = c
 		else:
-			self.__value += c
+			self._value += c
 
 	# копирует значение из другого регистра класса Registry
 	def copyFrom(self, R:'Registry'):
-		self.__value = R.value
+		self._value = R.value
 		# NEWIT копирование флага запятой
-		self.__comma = R.__comma
+		self._comma = R._comma
 		# TODO нужно будет копировать длины частей
 		self.__len_int = R.__len_int
 		self.__len_frac = R.__len_frac
@@ -130,18 +130,19 @@ class Registry:
 	# 2) определение длин целой и дробной частей
 	# TODO не протестировано в pytest
 	def prepare(self):
-		if self.__comma:
-			self.__value = self.__value.rstrip('0')
-			if self.__value.endswith('.'):
-				self.__value += '0'
-			self.__len_int = self.__value.find('.')
-			self.__len_frac = len(self.__value) - self.__len_int - 1
+		if self._comma:
+			self._value = self._value.rstrip('0')
+			if self._value.endswith('.'):
+				self._value += '0'
+			self.__len_int = self._value.find('.')
+			self.__len_frac = len(self._value) - self.__len_int - 1
 		else:
-			self.__len_int = len(self.__value)
+			self.__len_int = len(self._value)
 			# TODO тест ответа всегда с запятой
 			# self.__len_frac = 0
 			self.__len_frac = 1
-			self.__value += '.0'
+			self._value += '.0'
+			self._comma = True
 		# print(self.__len_int, self.__len_frac)
 
 	# NEWIT Генератор, извлекающий по 1 цифре из строки числа,
@@ -154,13 +155,13 @@ class Registry:
 		for _ in range(max_frac - self.__len_frac):
 			yield 0
 		# 2) генерирование дробной части, затем целой, пропуская точку (с конца)
-		for idx in range(len(self.__value)-1, -1, -1):
+		for idx in range(len(self._value)-1, -1, -1):
 			if idx > self.__len_int:
-				yield int(self.__value[idx])
+				yield int(self._value[idx])
 			elif idx == self.__len_int:
 				yield None
 			else:
-				yield int(self.__value[idx])
+				yield int(self._value[idx])
 		# 3) коррекция целой части (аналогично дробной (1))
 		for _ in range(max_int - self.__len_int):
 			yield 0
@@ -169,4 +170,34 @@ class Registry:
 
 	# TODO переделать, когда будут дробные числа
 	def __str__(self):
-		return self.__value
+		return self._value
+
+
+class RegistryZ(Registry):
+
+	# Конструктор для открытия файла логов
+	def __init__(self, value):
+		super().__init__(value)
+		self.fh = open('input_z.log', 'w', encoding='utf8')
+
+	def input(self, c: str, flags: object, A, B, op):
+		if c == 'new':
+			print('Начало сложения (add)', file=self.fh)
+			return
+		# NEWIT Если новый ввод, то сброс флага запятой
+		# if flags.IS_NEW_INPUT:
+		# 	self._comma = False
+		# NEWIT защита от ввода второй запятой
+		# if c == '.' and flags.IS_REG_FILLING and '.' in self._value:
+		if c == '.' and flags.IS_REG_FILLING and self._comma:
+			raise ValueError("could not convert string to float: '{0}'".format(self._value + c))
+		# NEWIT поднятие флага запятой, если введена запятая
+		if c == '.':
+			self._comma = True
+		# if (len(self._value) == 1 and self._value == "0") or flags.IS_NEW_INPUT:
+		# 	self._value = c
+		# else:
+		self._value = c + self._value
+		print(f"A='{A}'  ({op})  B='{B}'  Z='{self}'"
+				f"  CommaZ={self._comma}  CommaA={A.comma}"
+				f"  EQ={int(flags.EQ)}  CD={int(flags.CD)}  CONST={int(flags.CONST)}", file=self.fh)
