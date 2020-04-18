@@ -1,5 +1,6 @@
 from registers import Registry, RegistryZ
 
+# FIXME ТЗ устарело
 # TODO реконструкция ALU
 # Причины:
 # 1) необходимо реализовать математическую логику для 4 действий (+-/*)
@@ -24,7 +25,7 @@ class ALU:
 	def Z(self):
 		return self.__Z
 
-	# TODO очистка АЛУ
+	# очистка АЛУ
 	def clear(self):
 		self.__Z.clear()
 
@@ -33,12 +34,10 @@ class ALU:
 	# IN: B - ссылка на регистр B
 	# IN: op - обрабатываемая операция
 	def process(self, A: Registry, B: Registry, op: str):
-		# NEWIT очистка регистра перед вычислением (лучше бы после, чтобы не хранить значение)
+		# очистка регистра перед вычислением (лучше бы после, чтобы не хранить значение)
 		self.__Z.clear()
 		if op == '+':
-			# NEWIT новое вычисление через генераторы
 			for digit in self.add(A, B):
-				# NEWIT и использование переопределенного метода input для регистра Z
 				self.__Z.input(digit, self.__flags)
 		elif op == '-':
 			self.__Z.value = str(float(A.value) - float(B.value))
@@ -51,7 +50,6 @@ class ALU:
 		# KILLME Убрать в будущем (используется временно, т.к. не все операции реализуются через input)
 		if self.__Z.value.find('.') != -1:
 			self.__Z.comma = True
-		# NEWIT очистка от незначащих нулей используется в любом случае
 		self.__Z.prepare()
 		# выбор алгоритма вывода результатов
 		# если нажата "равно" и операция не завершена
@@ -74,7 +72,7 @@ class ALU:
 		else:
 			raise Exception("ALU: unknown flags combination")
 
-	# NEWIT генератор сложения (генерирует сбор строки числа)
+	# генератор сложения (генерирует сбор строки числа)
 	# IN: A - объект первого числа
 	# IN: B - объект второго числа
 	def add(self, A: Registry, B: Registry):

@@ -10,7 +10,7 @@ from registers import Registry
 import flags
 import ALU
 
-
+# FIXME ТЗ устарело
 # TODO реконструкция калькулятора
 # Реализация:
 # - [x] добавить возможность ввода точки для дробных величин
@@ -56,7 +56,7 @@ class Calculator:
 		elif self.mode == 2:
 			print("\r" + " "*80, end="")
 			print("\r" + self.A, end='')
-		# NEWIT изменился вид вывода (для возможности добавления новых значений)
+		# изменился вид вывода (для возможности добавления новых значений)
 		elif self.mode == 3:
 			return (f"A='{self.A}'  ({self.OP})  B='{self.B}'"
 				f"  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}")

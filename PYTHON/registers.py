@@ -5,6 +5,7 @@
 # ОПИСАНИЕ:  Описывает класс регистров калькулятора
 # *****************************************************************************
 
+# FIXME ТЗ устарело
 # TODO реконструкция регистра
 # Причины:
 # 1) нет смысла хранить несколько объектов отдельно (в классах Registry и BigFloat).
@@ -32,20 +33,16 @@ class Registry:
 	#            разные объекты
 	# IN: base - ссылка на базовый класс калькулятора для 
 	def __init__(self, name: str):
-		# NEWIT закрыть изменение имени регистра извне
 		self.__name = name  # буква регистра
-		# NEWIT закрыть изменение значения регистра извне напрямую (кроме регистра Z)
 		# TODO Можно закрыть изменение извне, если реализовать свойства в класса регистра Z ???
 		self._value = '0'  # значение регистра как строка
-		# NEWIT флаг ввода точки
 		self._comma = False # событие ввода точки
-		# NEWIT Длины каждой части
 		self.__len_int = 0
 		self.__len_frac = 0
 
 # -------------------------- Свойства класса ------------------------- #
 
-	# NEWIT getter значения регистра
+	# getter значения регистра
 	@property
 	def value(self):
 		return self._value
@@ -58,7 +55,7 @@ class Registry:
 		else:
 			raise ValueError("Registry: unable to set value for registry '{}'".format(self.__name))
 
-	# NEWIT свойство используется для вывода результатов (если не нужно, удалить)
+	# свойство используется для вывода результатов (если не нужно, удалить)
 	@property
 	def comma(self):
 		return int(self._comma)
@@ -71,7 +68,7 @@ class Registry:
 		else:
 			raise ValueError("Registry: unable to set value for registry '{}'".format(self.__name))
 
-	# NEWIT Длины частей (используются в АЛУ)
+	# Длины частей (используются в АЛУ)
 	@property
 	def len_int(self):
 		return self.__len_int
@@ -85,7 +82,6 @@ class Registry:
 	# сброс содержимого регистра
 	def clear(self):
 		self._value = '0'
-		# NEWIT сброс флага запятой при очистке
 		self._comma = False
 		self.__len_int = 0
 		self.__len_frac = 0
@@ -93,7 +89,6 @@ class Registry:
 	# затереть один символ с конца
 	def BS(self):
 		if len(self._value) > 1:
-			# NEWIT сброс флага запятой, если она затерта
 			if self._value[-1] == '.':
 				self._comma = False
 			self._value = self._value[:-1]
@@ -105,12 +100,9 @@ class Registry:
 	# IN: newInput - если True, то содержимое регистра заменяется новым значением в 'c'
 	#              - если False, то значение в 'c' добавляется в конец значения регистра
 	def input(self, c: str, flags: object):
-		# NEWIT Если новый ввод, то сброс флага запятой
 		if flags.IS_NEW_INPUT: self._comma = False
-		# NEWIT защита от ввода второй запятой
 		if c == '.' and flags.IS_REG_FILLING and self._comma:
 			raise ValueError("could not convert string to float: '{0}'".format(self._value + c))
-		# NEWIT поднятие флага запятой, если введена запятая
 		if c == '.': self._comma = True
 		if (len(self._value) == 1 and self._value == "0") or flags.IS_NEW_INPUT:
 			self._value = c
@@ -120,14 +112,10 @@ class Registry:
 	# копирует значение из другого регистра класса Registry
 	def copyFrom(self, R:'Registry'):
 		self._value = R.value
-		# NEWIT копирование флага запятой и длин частей
 		self._comma = R._comma
 		self.__len_int = R.__len_int
 		self.__len_frac = R.__len_frac
 
-	# NEWIT Работа метода:
-	# 1) удаление незначащих нулей дробной части
-	# 2) определение длин целой и дробной частей
 	# TODO не протестировано в pytest
 	def prepare(self):
 		if self._comma:
@@ -142,8 +130,6 @@ class Registry:
 			self._value += '.0'
 			self._comma = True
 
-	# NEWIT Генератор, извлекающий по 1 цифре из строки числа,
-	# скорректированный на длину максимального числа
 	# IN: max_int - максимальная длина целой части числа из двух
 	# IN: max_frac - максимальная длина дробной части числа из двух
 	def extract(self, max_int: int=0, max_frac: int=0):
@@ -174,9 +160,8 @@ class RegistryZ(Registry):
 
 	# Конструктор для открытия файла логов
 	def __init__(self):
-		# NEWIT инициализируем конкретный регистр
 		super().__init__('Z')
-		# NEWIT логгирование сборки числа в регистре Z
+		# логгирование сборки числа в регистре Z
 		# self.fh = open('PYTHON/logs/input_z.log', 'w', encoding='utf8')
 
 	# Переопределяем метод очистки
@@ -185,15 +170,12 @@ class RegistryZ(Registry):
 		self._value = ''
 
 	def input(self, c: str, flags: object):
-		# NEWIT Сброс флага запятой выполняется в методу clear перед началом операции
-		# NEWIT защита от ввода второй запятой
 		# TODO теоретически не нужна, т.к. на вход подаются регистры с заведомо одной запятой
 		if c == '.' and flags.IS_REG_FILLING and self._comma:
 			raise ValueError("could not convert string to float: '{0}'".format(self._value + c))
-		# NEWIT поднятие флага запятой, если введена запятая (необходимо для обработки prepare)
+		# поднятие флага запятой, если введена запятая (необходимо для обработки prepare)
 		if c == '.':
 			self._comma = True
-		# NEWIT используется только один вариант заполнения для регистра Z
 		self._value = c + self._value
 		# print(f"A='{A}'  ({op})  B='{B}'  Z='{self}'"
 		# 		f"  CommaZ={self._comma}  CommaA={A.comma}"
