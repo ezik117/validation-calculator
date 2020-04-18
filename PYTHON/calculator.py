@@ -15,7 +15,7 @@ import ALU
 # Реализация:
 # - [x] добавить возможность ввода точки для дробных величин
 # TODO перемещение флага в регистры
-# - [-] ??? нужен ли флаг введенной точки
+# - [-] ??? нужен ли флаг введенной точки (вынесен в класс Registry)
 
 class Calculator:
 	""" ОСНОВНОЙ КЛАСС КАЛЬКУЛЯТОРА """
@@ -91,7 +91,6 @@ class Calculator:
 			self.__ALU.process(self.B, self.A, self.OP)
 		else:
 			self.__ALU.process(self.A, self.B, self.OP)
-		# self.A.prepare()
 		self.flags.NEW_REG_FILLING
 		self.flags.DISABLE_OPS_CONTINUES
 

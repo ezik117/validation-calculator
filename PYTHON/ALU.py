@@ -1,5 +1,3 @@
-import pdb
-
 from registers import Registry, RegistryZ
 
 # TODO реконструкция ALU
@@ -17,7 +15,8 @@ class ALU:
 
 	def __init__(self, flags: object):
 		self.__flags = flags
-		self.__Z = RegistryZ('Z')  # симуляция регистра АЛУ
+		# Регистр Z определяется через свой конструктор
+		self.__Z = RegistryZ()  # виртуальный регистр АЛУ
 
 
 	# TODO удалить
@@ -32,22 +31,15 @@ class ALU:
 
 	# IN: A - ссылка на регистр A
 	# IN: B - ссылка на регистр B
+	# IN: op - обрабатываемая операция
 	def process(self, A: Registry, B: Registry, op: str):
-		# FIXME неправильно работает при нажатии равно
-		# BUG 1 - в prepare добавлялось ".0", но флаг запятой не изменялся
-		# BUG 2 - input в Z изменял слишком много
+		# NEWIT очистка регистра перед вычислением (лучше бы после, чтобы не хранить значение)
+		self.__Z.clear()
 		if op == '+':
-			# self.__Z.value = str(float(A.value) + float(B.value))
-			# self.__Z.value = self.add(A, B)
-			# TODO создать сборку через input ?
-			# self.__Z.clear()
-			self.__Z.value = ''
-			self.__Z.comma = False
-			print(self.__flags.control())
-			self.__Z.input('new', self.__flags, A, B, op)
+			# NEWIT новое вычисление через генераторы
 			for digit in self.add(A, B):
-				self.__Z.input(digit, self.__flags, A, B, op)
-				# self.__Z.value = digit + self.__Z.value
+				# NEWIT и использование переопределенного метода input для регистра Z
+				self.__Z.input(digit, self.__flags)
 		elif op == '-':
 			self.__Z.value = str(float(A.value) - float(B.value))
 		elif op == '/':
@@ -56,15 +48,13 @@ class ALU:
 			self.__Z.value = str(float(A.value) * float(B.value))
 		else:
 			return  # нет операции
-		# TODO (future ?) после вычисления нет информации о точке, на которой основываются расчеты
+		# KILLME Убрать в будущем (используется временно, т.к. не все операции реализуются через input)
 		if self.__Z.value.find('.') != -1:
 			self.__Z.comma = True
+		# NEWIT очистка от незначащих нулей используется в любом случае
 		self.__Z.prepare()
 		# выбор алгоритма вывода результатов
 		# если нажата "равно" и операция не завершена
-		# pdb.set_trace()
-		# pdb.pm()
-		# pdb.post_mortem()
 		if self.__flags.IS_B_op_A:
 			# копируем из А в В
 			B.copyFrom(A)
