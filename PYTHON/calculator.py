@@ -69,7 +69,9 @@ class Calculator:
 			self.A.BS()
 		else:	
 			self.A.input(c, self.flags)
-			self.flags.ENABLE_REG_FILLING
+			# NEWIT флаг заполнения регистра устанавливается, если 0 не является первым
+			if self.flags.IS_NEW_INPUT and c != '0':
+				self.flags.ENABLE_REG_FILLING
 
 	# нажата арифметическая клавиша - обработаем
 	# IN: с - символ нажатой клавиши
