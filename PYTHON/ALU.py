@@ -1,14 +1,16 @@
 from registers import Registry, RegistryZ
 
-# FIXME ТЗ устарело
 # TODO реконструкция ALU
 # Причины:
 # 1) необходимо реализовать математическую логику для 4 действий (+-/*)
 # Реализация:
-# 1) Получить 2 части числа через генератор yield ???
-# Можно будет сразу собирать результат и отдавать, чтобы не хранить его
-# 2) Для этого нужно знать длину каждой части, чтобы выравнивать их
-
+# - [x] Получить 2 части числа через генератор yield
+# - [x] получить длину каждой части, чтобы выравнивать их
+# - [x] реализовать логику для сложения
+# - [ ] реализовать логику для вычитания
+# - [x] нужен метод определения большего и меньшего из двух операндов (регистров)
+# - [ ] реализовать логику для умножения
+# - [ ] реализовать логику для деления
 
 # ------------- АРИФМЕТИЧЕСКО-ЛОГИЧЕСКОЕ УСТРОЙСТВО (АЛУ) ------------ #
 
@@ -18,6 +20,11 @@ class ALU:
 		self.__flags = flags
 		# Регистр Z определяется через свой конструктор
 		self.__Z = RegistryZ()  # виртуальный регистр АЛУ
+		# NEWIT хранение ссылок на больший и меньший регистр
+		self.__bigger = None
+		self.__smaller = None
+		# NEWIT если оба операнда равны по модулю - True
+		self.__equal = False
 
 
 	# TODO удалить
@@ -28,6 +35,10 @@ class ALU:
 	# очистка АЛУ
 	def clear(self):
 		self.__Z.clear()
+		# NEWIT обнуление флага равности и удаление ссылок сравнения регистров
+		self.__bigger = None
+		self.__smaller = None
+		self.__equal = False
 
 
 	# IN: A - ссылка на регистр A
@@ -35,11 +46,16 @@ class ALU:
 	# IN: op - обрабатываемая операция
 	def process(self, A: Registry, B: Registry, op: str):
 		# очистка регистра перед вычислением (лучше бы после, чтобы не хранить значение)
-		self.__Z.clear()
+		# NEWIT замена на очистку АЛУ, которая включает очистку регистра Z
+		self.clear()
 		if op == '+':
 			for digit in self.add(A, B):
 				self.__Z.input(digit, self.__flags)
 		elif op == '-':
+			# Тест сравнения
+			self.compare(A, B)
+			print('больше:', self.__bigger.name)
+			print('меньше:', self.__smaller.name)
 			self.__Z.value = str(float(A.value) - float(B.value))
 		elif op == '/':
 			self.__Z.value = str(float(A.value) / float(B.value))
@@ -95,3 +111,43 @@ class ALU:
 				yield sum
 		if carry:
 			yield '1'
+
+	# NEWIT генератор определения большего и меньшего из операндов
+	# TODO лапшеобразный код. Как уменьшить ???
+	# IN: A - объект первого числа
+	# IN: B - объект второго числа
+	def compare(self, A: Registry, B: Registry):
+		# WARNING предполагается, что нет незначащих нулей в начале числа
+		# это подразумевается логикой программы, но может измениться
+		if A.len_int > B.len_int:
+			self.__bigger = A
+			self.__smaller = B
+			return
+		if A.len_int < B.len_int:
+			self.__bigger = B
+			self.__smaller = A
+			return
+		max_len_int = max(A.len_int, B.len_int)
+		max_len_frac = max(A.len_frac, B.len_frac)
+		# Если длины целых частей равны, то сравниваем в zip-объекте с помощью генераторов
+		# Для начала нужны ссылки на генераторы для возможности их остановки
+		regA = A.extract(max_len_int, max_len_frac)
+		regB = B.extract(max_len_int, max_len_frac)
+		for x, y in zip(regA, regB):
+			# Если попалась точка дробной части
+			if x is None and y is None:
+				pass
+			else:
+				if x > y:
+					self.__bigger = A
+					self.__smaller = B
+					regA.close()
+					regB.close()
+					return
+				if x < y:
+					self.__bigger = B
+					self.__smaller = A
+					regA.close()
+					regB.close()
+					return
+		self.__equal = True

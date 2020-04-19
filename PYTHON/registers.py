@@ -77,6 +77,9 @@ class Registry:
 	def len_frac(self):
 		return self.__len_frac
 
+	@property
+	def name(self):
+		return self.__name
 # --------------------------- Методы класса -------------------------- #
 
 	# сброс содержимого регистра
