@@ -37,7 +37,7 @@ class Registry:
 	def __init__(self, name: str):
 		self.__name = name  # буква регистра
 		# TODO Можно закрыть изменение извне, если реализовать свойства в класса регистра Z ???
-		self._value = bf.BigFloat()  # значение регистра как объект числа BigFloat
+		self._value = bf.BigFloat(self.__name)  # значение регистра как объект числа BigFloat
 		# NEWIT не нужны
 		# self._comma = False # событие ввода точки
 		# self.__len_int = 0
@@ -49,7 +49,7 @@ class Registry:
 	# NEWIT переведен на объект числа
 	@property
 	def value(self):
-		return str(self._value)
+		return self._value
 
 	# KILLME можно удалить после реализации все операций
 	@value.setter
@@ -91,7 +91,7 @@ class Registry:
 	# сброс содержимого регистра
 	def clear(self):
 		# NEWIT просто создаем новый пустой объект
-		self._value = bf.BigFloat()
+		self._value = bf.BigFloat(self.__name)
 		# NEWIT т.к. все контролируется объектом числа
 		# self._comma = False
 		# self.__len_int = 0
@@ -120,13 +120,26 @@ class Registry:
 		# if c == '.': self._value.comma = True
 		# NEWIT если новый ввод, создаем новый объект числа
 		if flags.IS_NEW_INPUT:
-			self._value = bf.BigFloat()
+			self._value = bf.BigFloat(self.__name)
+		# Определить метод вызова для присвоения значений числу
+		# Изменение самого объекта при его вызове
+		# Ошибка при вводе второй точки
+		# TODO определить lambda для общих регистров и для Z
+		# или map ?
+		if c == '.' and self._value.comma:
+			# FIXME метод __format__
+			raise ValueError("could not convert string to float: '{0}'".format(str(self._value) + c))
+		if c == '.':
+			self._value.comma = True
+		elif self._value.comma:
+			self._value.fraction += c
+		# в том числе отсекает ввод незанчащих 0 целой части
+		# TODO заменить self.__integer на len == 0
+		elif self._value.integer or c != '0':
+			self._value.integer += c
 		# NEWIT и просто вводим символ (объект числа сам разберется куда его писать)
-		self._value(c)
-		# if (len(self._value) == 1 and self._value == "0") or flags.IS_NEW_INPUT:
-		# 	self._value = c
-		# else:
-		# 	self._value += c
+		# self._value.input(c)
+
 
 	# копирует значение из другого регистра класса Registry
 	def copyFrom(self, R:'Registry'):
@@ -154,27 +167,29 @@ class Registry:
 	# IN: max_int - максимальная длина целой части числа из двух
 	# IN: max_frac - максимальная длина дробной части числа из двух
 	def extract(self, max_int: int=0, max_frac: int=0):
+		# NEWIT пока используем ссылку на extract из BigFloat
+		return self._value.extract(max_int, max_frac)
 		# Начинаем с конца
 		# 1) коррекция дробной части (len_frac либо равна, либо меньше max_frac)
-		for _ in range(max_frac - self.__len_frac):
-			yield 0
-		# 2) генерирование дробной части, затем целой, пропуская точку (с конца)
-		for idx in range(len(self._value)-1, -1, -1):
-			if idx > self.__len_int:
-				yield int(self._value[idx])
-			elif idx == self.__len_int:
-				yield None
-			else:
-				yield int(self._value[idx])
-		# 3) коррекция целой части (аналогично дробной (1))
-		for _ in range(max_int - self.__len_int):
-			yield 0
+		# for _ in range(max_frac - self.__len_frac):
+		# 	yield 0
+		# # 2) генерирование дробной части, затем целой, пропуская точку (с конца)
+		# for idx in range(len(self._value)-1, -1, -1):
+		# 	if idx > self.__len_int:
+		# 		yield int(self._value[idx])
+		# 	elif idx == self.__len_int:
+		# 		yield None
+		# 	else:
+		# 		yield int(self._value[idx])
+		# # 3) коррекция целой части (аналогично дробной (1))
+		# for _ in range(max_int - self.__len_int):
+		# 	yield 0
 
 # ------------------------ Специальные методы ------------------------ #
 
 	# TODO переделать, когда будут дробные числа
 	def __str__(self):
-		return self._value
+		return str(self._value)
 
 
 class RegistryZ(Registry):
@@ -184,6 +199,8 @@ class RegistryZ(Registry):
 		super().__init__('Z')
 		# логгирование сборки числа в регистре Z
 		# self.fh = open('PYTHON/logs/input_z.log', 'w', encoding='utf8')
+		# из тестов pytest
+		self.fh = open('input_z.log', 'w', encoding='utf8')
 
 	# NEWIT свойство значения
 	@property
@@ -201,14 +218,29 @@ class RegistryZ(Registry):
 	# 	self._value = ''
 
 	# NEWIT ??? возможно не будет нужен
-	def input(self, c: str, flags: object):
-		# TODO теоретически не нужна, т.к. на вход подаются регистры с заведомо одной запятой
-		if c == '.' and flags.IS_REG_FILLING and self._comma:
-			raise ValueError("could not convert string to float: '{0}'".format(self._value + c))
-		# поднятие флага запятой, если введена запятая (необходимо для обработки prepare)
+	def input(self, c: str, flags: object, A, B, op):
+		# super().input(c, flags)
+		# if flags.IS_NEW_INPUT:
+		# 	self._value = bf.BigFloat(self.__name)
+		# Определить метод вызова для присвоения значений числу
+		# Изменение самого объекта при его вызове
+		# Ошибка при вводе второй точки
+		# TODO определить lambda для общих регистров и для Z
+		# или map ?
+		if c == '.' and self._value.comma:
+			# FIXME метод __format__
+			raise ValueError("could not convert string to float: '{0}'".format(str(self._value) + c))
 		if c == '.':
-			self._comma = True
-		self._value = c + self._value
-		# print(f"A='{A}'  ({op})  B='{B}'  Z='{self}'"
-		# 		f"  CommaZ={self._comma}  CommaA={A.comma}"
-		# 		f"  EQ={int(flags.EQ)}  CD={int(flags.CD)}  CONST={int(flags.CONST)}", file=self.fh)
+			self._value.comma = True
+		elif self._value.comma:
+			self._value.integer = c + self._value.integer
+		# в том числе отсекает ввод незанчащих 0 целой части
+		# TODO заменить self.__integer на len == 0
+		elif self._value.fraction or c != 0:
+			self._value.fraction = c + self._value.fraction
+		# NEWIT и просто вводим символ (объект числа сам разберется куда его писать)
+			# self._value.input(c)
+		print(f"A='{A}'  ({op})  B='{B}'  Z='{self}'"
+				f"  CommaZ={self._value.comma}  CommaA={A.value.comma}"
+				f"  Zint={self._value.integer}  Zfrac={self._value.fraction}"
+				f"  EQ={int(flags.EQ)}  CD={int(flags.CD)}  CONST={int(flags.CONST)}", file=self.fh)

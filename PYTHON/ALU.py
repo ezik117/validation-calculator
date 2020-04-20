@@ -50,12 +50,12 @@ class ALU:
 		self.clear()
 		if op == '+':
 			for digit in self.add(A, B):
-				self.__Z.input(digit, self.__flags)
+				self.__Z.input(digit, self.__flags, A, B, op)
 		elif op == '-':
 			# Тест сравнения
-			self.compare(A, B)
-			print('больше:', self.__bigger.name)
-			print('меньше:', self.__smaller.name)
+			# self.compare(A, B)
+			# print('больше:', self.__bigger.name)
+			# print('меньше:', self.__smaller.name)
 			self.__Z.value = str(float(A.value) - float(B.value))
 		elif op == '/':
 			self.__Z.value = str(float(A.value) / float(B.value))
@@ -64,9 +64,9 @@ class ALU:
 		else:
 			return  # нет операции
 		# KILLME Убрать в будущем (используется временно, т.к. не все операции реализуются через input)
-		if self.__Z.value.find('.') != -1:
-			self.__Z.comma = True
-		self.__Z.prepare()
+		# if self.__Z.value.find('.') != -1:
+		# 	self.__Z.comma = True
+		# self.__Z.prepare()
 		# выбор алгоритма вывода результатов
 		# если нажата "равно" и операция не завершена
 		if self.__flags.IS_B_op_A:
@@ -100,7 +100,7 @@ class ALU:
 		for x, y in zip(A.extract(max_len_int, max_len_frac),
 						B.extract(max_len_int, max_len_frac)):
 			# Если попалась точка дробной части
-			if x is None and y is None:
+			if (x is None and A.comma) or (y is None and B.comma):
 				yield '.'
 			else:
 				sum = str(x + y + carry)

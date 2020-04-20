@@ -20,7 +20,7 @@ class TestRegisters():
 	def test_initial(self):
 		reg = registers.Registry('A')
 		assert 'A' == reg.name
-		assert '0' == reg.value
+		assert '0' == str(reg.value)
 		return reg
 
 	# добавление цифр, точки

@@ -77,7 +77,8 @@ class Calculator:
 	# IN: с - символ нажатой клавиши
 	def pressedOpcode(self, c: str):
 		self.flags.EQUAL_NOT_PRESSED
-		self.A.prepare()
+		# NEWIT метод не нужен, этим занимается объект  класса BigFloat
+		# self.A.prepare()
 		if self.flags.IS_OPERATON_POSSIBLE:
 			self.__ALU.process(self.B, self.A, self.OP)
 		self.B.copyFrom(self.A)
@@ -88,7 +89,7 @@ class Calculator:
 	# нажата клавиша "равно" - обработаем
 	def pressedEqual(self):
 		self.flags.EQUAL_PRESSED
-		self.A.prepare()
+		# self.A.prepare()
 		if self.flags.IS_OPS_CONTINUES:
 			self.__ALU.process(self.B, self.A, self.OP)
 		else:

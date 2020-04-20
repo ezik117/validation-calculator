@@ -29,12 +29,13 @@ class TestFlags():
 		calc.pressedDigitalKey('4')
 		assert "A='54'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
 		calc.pressedDigitalKey('.')
-		assert "A='54.'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
+		assert "A='54.0'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
 		calc.pressedDigitalKey('4')
 		assert "A='54.4'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
 		return calc
 
 	# проверка BackSpace BS
+	# @pytest.mark.skip()
 	def test_BS(self):
 		calc = self.test_input_digits()
 		calc.pressedDigitalKey('8')
@@ -121,7 +122,7 @@ class TestFlags():
 		calc.pressedDigitalKey('2')
 		assert "A='12'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
 		calc.pressedDigitalKey('.')
-		assert "A='12.'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
+		assert "A='12.0'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
 		calc.pressedDigitalKey('1')
 		calc.pressedDigitalKey('2')
 		assert "A='12.12'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
