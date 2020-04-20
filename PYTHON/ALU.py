@@ -50,7 +50,7 @@ class ALU:
 		self.clear()
 		if op == '+':
 			for digit in self.add(A, B):
-				self.__Z.input(digit, self.__flags, A, B, op)
+				self.__Z.input(digit, self.__flags)
 		elif op == '-':
 			# Тест сравнения
 			# self.compare(A, B)
@@ -63,10 +63,7 @@ class ALU:
 			self.__Z.value = str(float(A.value) * float(B.value))
 		else:
 			return  # нет операции
-		# KILLME Убрать в будущем (используется временно, т.к. не все операции реализуются через input)
-		# if self.__Z.value.find('.') != -1:
-		# 	self.__Z.comma = True
-		# self.__Z.prepare()
+		# TODO возможно, нужно будет очищать незначащие 0 целой части
 		# выбор алгоритма вывода результатов
 		# если нажата "равно" и операция не завершена
 		if self.__flags.IS_B_op_A:

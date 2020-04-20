@@ -7,21 +7,18 @@
 
 class BigFloat:
 
-	def __init__(self, reg):
+	def __init__(self):
 		# Значение числа (строка, хотя можно сделать любой объект - список, файл)
 		# TODO попробуем хранить, как и раньше, отдельно целую и дробную части
 		# Определить 0 как пустые строки
 		self.__integer = ''
 		self.__fraction = ''
-		# TODO нужно ли, если есть 2 части ???
-		# можно использовать как переход от дробной к целой части и наоборот (для BS и input)
+		# используется как переход от дробной к целой части и наоборот (для BS и input)
 		self.__comma = False
-		# NEWIT определение обработки входящих цифр (зависит от регистра)
-		# self.__action = self.__influence(reg)
 
 # ----------------------------- Свойства ----------------------------- #
 
-	# Запятая (разделитель) для переходов от части к части числа
+	# Запятая (разделитель) для переходов от одной части к другой части числа
 	@property
 	def comma(self):
 		return self.__comma
@@ -66,7 +63,7 @@ class BigFloat:
 			self.__comma = False
 		elif self.__integer:
 			self.__integer = self.__integer[:-1]
-		# есои нет никаких значений, то не делаем ничего
+		# если нет никаких значений, то не делаем ничего
 
 	# IN: max_int - максимальная длина целой части числа из двух
 	# IN: max_frac - максимальная длина дробной части числа из двух
@@ -86,41 +83,9 @@ class BigFloat:
 		# 4) генерирование целой части
 		for digit in self.__integer[::-1]:
 			yield int(digit)
-		#  затем целой, пропуская точку (с конца)
-		# for idx in range(len(self._value)-1, -1, -1):
-		# 	if idx > self.__len_int:
-		# 		yield int(self._value[idx])
-		# 	elif idx == self.len_int:
-		# 		yield None
-		# 	else:
-		# 		yield int(self._value[idx])
 		# 5) коррекция целой части (аналогично дробной (1))
 		for _ in range(max_int - self.len_int):
 			yield 0
-
-	# Выбор метода обработки входящих цифр (в прямом для обычных регистров
-	# или в обратном порядке для регистра Z)
-	# def __influence(self, reg):
-	# 	if reg == 'Z':
-	# 		return lambda p, c: c + p
-	# 	return lambda p, c: p + c
-
-	# Определить метод вызова для присвоения значений числу
-	# Изменение самого объекта при его вызове
-	# def input(self, c):
-	# 	# Ошибка при вводе второй точки
-	# 	# TODO определить lambda для общих регистров и для Z
-	# 	# или map ?
-	# 	if c == '.' and self.comma:
-	# 		raise ValueError("could not convert string to float: '{0}'".format(self._value + c))
-	# 	if c == '.':
-	# 		self.comma = True
-	# 	elif self.comma:
-	# 		self.__fraction = self.__action(self.__fraction, c)
-	# 	# в том числе отсекает ввод незанчащих 0 целой части
-	# 	# TODO заменить self.__integer на len == 0
-	# 	elif self.__integer or c != '0':
-	# 		self.__integer = self.__action(self.__integer, c)
 
 # ------------------------ Специальные методы ------------------------ #
 
@@ -142,6 +107,6 @@ class BigFloat:
 		# если нужен ноль с точкой, можно переделать
 		return (integer + comma + frac) if len(self) else '0'
 
-	# Для метода format
-	# def __format__(self, format_spec):
-	# 	return format(str(self), format_spec)
+	# Для переопределения метода format
+	def __format__(self, format_spec):
+		return format(str(self), format_spec)
