@@ -64,6 +64,8 @@ class ALU:
 		else:
 			return  # нет операции
 		# TODO возможно, нужно будет очищать незначащие 0 целой части
+		# NEWIT удаление незначащих нулей дробной части
+		self.__Z.truncate()
 		# выбор алгоритма вывода результатов
 		# если нажата "равно" и операция не завершена
 		if self.__flags.IS_B_op_A:
@@ -85,17 +87,23 @@ class ALU:
 		else:
 			raise Exception("ALU: unknown flags combination")
 
+# ---------------------------- Мои методы ---------------------------- #
+
+	# Вычисление максимальных длин целой и дробной частей
+	def __max_len(self, A: Registry, B: Registry):
+		return max(A.len_int, B.len_int), max(A.len_frac, B.len_frac)
+
 	# генератор сложения (генерирует сбор строки числа)
 	# IN: A - объект первого числа
 	# IN: B - объект второго числа
 	def add(self, A: Registry, B: Registry):
 		# Вначале нужно найти максимально длинную часть
-		max_len_int = max(A.len_int, B.len_int)
-		max_len_frac = max(A.len_frac, B.len_frac)
+		# max_len_int = max(A.len_int, B.len_int)
+		# max_len_frac = max(A.len_frac, B.len_frac)
+		max_len = self.__max_len(A, B)
 		carry = 0
 		# Генератор результата суммы
-		for x, y in zip(A.extract(max_len_int, max_len_frac),
-						B.extract(max_len_int, max_len_frac)):
+		for x, y in zip(A.extract(*max_len), B.extract(*max_len)):
 			# Если попалась точка дробной части
 			if (x is None and A.comma) or (y is None and B.comma):
 				yield '.'

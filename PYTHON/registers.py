@@ -111,7 +111,9 @@ class Registry:
 		self._value = R.value
 		# NEWIT Теперь не нужно их копировать comma, len_int, len_frac
 
-	# NEWIT prepare не нужен, т.к. все делается в объекте числа
+	# NEWIT prepare опять нужен, делегируется объекту числа
+	def truncate(self):
+		self._value.truncate()
 
 	# IN: max_int - максимальная длина целой части числа из двух
 	# IN: max_frac - максимальная длина дробной части числа из двух

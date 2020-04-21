@@ -87,13 +87,36 @@ class BigFloat:
 		for _ in range(max_int - self.len_int):
 			yield 0
 
+	# Обрезка незначащих нулей дробной части
+	def truncate(self):
+		self.fraction = self.fraction.rstrip('0')
+
+	# Вычисление максимальных длин целой и дробной частей
+	def __max_len(self, other):
+		return max(self.len_int, other.len_int), max(self.len_frac, other.len_frac)
+
 # ------------------------ Специальные методы ------------------------ #
 
 	# Длина числа как длины целой и дробной части плюс 1 позиция точки (для совместимости с Registry)
 	def __len__(self):
 		return len(self.__integer) + int(self.__comma) + len(self.__fraction)
 	
-	
+	# Метод равенства можно реализовать простым способом
+	def __eq__(self, other):
+		return self.integer == other.integer and self.fraction == other.fraction
+
+	# Неравенство таким же способом не удается реализовать, т.к. требуется выравнивание
+	def __lt__(self, other):
+		max_len = self.__max_len(other)
+		if self.__integer.zfill(max_len[0]) < other.__integer.zfill(max_len[0]):
+			return True
+		if (self.__integer.zfill(max_len[0]) == other.__integer.zfill(max_len[0])
+				and self.__fraction.ljust(max_len[1], '0') < other.__fraction.ljust(max_len[1], '0')):
+			return True
+		return False
+
+	def __le__(self, other):
+		return self == other or self < other
 
 	# Строковое представление:
 	# 1) если ничего не введено, то выводит 0
