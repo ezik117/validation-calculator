@@ -21,10 +21,10 @@ class ALU:
 		# Регистр Z определяется через свой конструктор
 		self.__Z = RegistryZ()  # виртуальный регистр АЛУ
 		# NEWIT хранение ссылок на больший и меньший регистр
-		self.__bigger = None
-		self.__smaller = None
+		# self.__bigger = None
+		# self.__smaller = None
 		# NEWIT если оба операнда равны по модулю - True
-		self.__equal = False
+		# self.__equal = False
 
 
 	# TODO удалить
@@ -36,9 +36,9 @@ class ALU:
 	def clear(self):
 		self.__Z.clear()
 		# NEWIT обнуление флага равности и удаление ссылок сравнения регистров
-		self.__bigger = None
-		self.__smaller = None
-		self.__equal = False
+		# self.__bigger = None
+		# self.__smaller = None
+		# self.__equal = False
 
 
 	# IN: A - ссылка на регистр A
