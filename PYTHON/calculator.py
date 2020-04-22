@@ -6,15 +6,16 @@
 # *****************************************************************************
 
 import msvcrt
-from registers import Regisry
+from registers import Registry
 import flags
 import ALU
 
 
 # TODO реконструкция калькулятора
 # Реализация:
-# - [ ] добавить возможность ввода точки для дробных величин
-# - [ ] ??? нужен ли флаг введенной точки
+# - [x] добавить возможность ввода точки для дробных величин
+# TODO перемещение флага в регистры
+# - [-] ??? нужен ли флаг введенной точки (вынесен в класс Registry)
 
 class Calculator:
 	""" ОСНОВНОЙ КЛАСС КАЛЬКУЛЯТОРА """
@@ -23,11 +24,10 @@ class Calculator:
 	#            0 - тестовый, отображение регистров и флагов. Каждая операция оставляет строку
 	#            1 - тестовый, отображение регистров и флагов как в 0, только одной строкой
 	#            2 - рабочий, отображает только дисплей калькулятора
-	# NEWIT тестовый для pytest
 	#            3 - тестовый, отображение регистров и флагов, как в 0. Осуществляется возврат значения для pytest
 	def __init__(self, mode: int=0):
-		self.A = Regisry('A') # регистр A
-		self.B = Regisry('B') # регистр B
+		self.A = Registry('A') # регистр A
+		self.B = Registry('B') # регистр B
 		# регистр Z теперь полностью принадлежит АЛУ, в калькуляторе его нет
 		self.OP = None        # текущее арифметическое действие
 		self.flags = flags.Flags()  # флаги калькулятора
@@ -44,68 +44,54 @@ class Calculator:
 		# очищаем АЛУ (фактически только регистр Z на данном этапе)
 		self.__ALU.clear()
 		self.OP = None
-		# NEWIT метод изменен во Flags
 		self.flags.clear()
 
 	# отобразить содержимое регистров в соответствии с выбранным режимом mode
 	def displayRegisters(self):
 		if self.mode == 0:
-			print(f"A='{self.A}'  ({self.OP})  B='{self.B}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}")
+			print(f"A='{self.A}'  ({self.OP})  B='{self.B}'  Z='{self.__ALU.Z}'  CommaZ={self.__ALU.Z.comma}  CommaA={self.A.comma}  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}")
 		elif self.mode == 1:
 			print("\r" + " "*50, end='\r')
 			print(f"A='{self.A}'  ({self.OP})  B='{self.B}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}", end="\r")
 		elif self.mode == 2:
 			print("\r" + " "*80, end="")
 			print("\r" + self.A, end='')
-		# NEWIT Режим тестирования pytest
+		# NEWIT изменился вид вывода (для возможности добавления новых значений)
 		elif self.mode == 3:
-			return f"A='{self.A}'  ({self.OP})  B='{self.B}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}"
+			return (f"A='{self.A}'  ({self.OP})  B='{self.B}'"
+				f"  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}")
 
 	# нажата цифровая клавиша. Ввод значения в регистр A
 	# IN: с - символ нажатой клавиши
 	def pressedDigitalKey(self, c: str):
+		self.flags.EQUAL_NOT_PRESSED
 		if c == '\x08':
 			self.A.BS()
 		else:	
-			# self.A.input(c, self.flags.CD)
-			# NEWIT передача ссылки на весь объект теоретически даже менее затратна, чем передача отдельного флага
 			self.A.input(c, self.flags)
-			# self.flags.CD = False
-			# NEWIT замена вида флага
 			self.flags.ENABLE_REG_FILLING
 
 	# нажата арифметическая клавиша - обработаем
 	# IN: с - символ нажатой клавиши
 	def pressedOpcode(self, c: str):
-		# if not self.flags.CD:
-		# 	if self.flags.CONST:
-		# NEWIT замена вида флага
+		self.flags.EQUAL_NOT_PRESSED
+		self.A.prepare()
 		if self.flags.IS_OPERATON_POSSIBLE:
-			# теперь обработка такого вида:
 			self.__ALU.process(self.B, self.A, self.OP)
 		self.B.copyFrom(self.A)
 		self.OP = c
-		# self.flags.CD = True
-		# NEWIT замена вида флага
 		self.flags.NEW_REG_FILLING
-		# self.flags.CONST = True
-		# NEWIT замена вида флага
 		self.flags.ENABLE_OPS_CONTINUES
 
 	# нажата клавиша "равно" - обработаем
 	def pressedEqual(self):
-		# if self.flags.CONST:
-		# NEWIT замена вида флага
+		self.flags.EQUAL_PRESSED
+		self.A.prepare()
 		if self.flags.IS_OPS_CONTINUES:
 			self.__ALU.process(self.B, self.A, self.OP)
 		else:
 			self.__ALU.process(self.A, self.B, self.OP)
-
-		# self.flags.CD = True
-		# NEWIT замена вида флага
 		self.flags.NEW_REG_FILLING
-		# self.flags.CONST = False
-		# NEWIT замена вида флага
 		self.flags.DISABLE_OPS_CONTINUES
 
 	# цикл обработки нажатия клавиш с клавиатуры
@@ -119,27 +105,16 @@ class Calculator:
 					break
 
 				# digital keys
-				if ('0' <= c <= '9') or (c == '\x08'):
-					# self.flags.EQ = False
-					# NEWIT замена вида флага
-					self.flags.EQUAL_NOT_PRESSED
+				if c in set('0123456789.') or (c == '\x08'):
 					self.pressedDigitalKey(c)
 				# reset key
 				elif c == '\x1B':
 					self.clear()
 				# opcode keys
 				elif c in ['+', '-', '*', '/']:
-					# self.flags.EQ = False
-					# NEWIT замена вида флага
-					self.flags.EQUAL_NOT_PRESSED
 					self.pressedOpcode(c)
 				# equal key
 				elif c == '\x0D':
-					# self.flags.EQ = True
-					# NEWIT замена вида флага
-					self.flags.EQUAL_PRESSED
 					self.pressedEqual()
 
 				self.displayRegisters()
-
-# NEWIT АЛУ вынесен в отдельный класс
