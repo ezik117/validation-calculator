@@ -5,6 +5,9 @@
 # ОПИСАНИЕ:  Описывает класс больших чисел, используемых в регистрах
 # *****************************************************************************
 
+# Константы доступа к кортежу значений максимальных длин
+_INTEGER, _FRACTION = range(2)
+
 class BigFloat:
 
 	def __init__(self):
@@ -92,6 +95,8 @@ class BigFloat:
 		self.fraction = self.fraction.rstrip('0')
 
 	# Вычисление максимальных длин целой и дробной частей
+	# OUT: [0] - максимальная длина целой части
+	# OUT: [1] - максимальная длина дробной части
 	def __max_len(self, other):
 		return max(self.len_int, other.len_int), max(self.len_frac, other.len_frac)
 
@@ -108,10 +113,13 @@ class BigFloat:
 	# Неравенство таким же способом не удается реализовать, т.к. требуется выравнивание
 	def __lt__(self, other):
 		max_len = self.__max_len(other)
-		if self.__integer.zfill(max_len[0]) < other.__integer.zfill(max_len[0]):
+		if (self.__integer.zfill(max_len[_INTEGER])
+				< other.__integer.zfill(max_len[_INTEGER])):
 			return True
-		if (self.__integer.zfill(max_len[0]) == other.__integer.zfill(max_len[0])
-				and self.__fraction.ljust(max_len[1], '0') < other.__fraction.ljust(max_len[1], '0')):
+		if ((self.__integer.zfill(max_len[_INTEGER])
+					== other.__integer.zfill(max_len[_INTEGER]))
+				and (self.__fraction.ljust(max_len[_FRACTION], '0')
+					< other.__fraction.ljust(max_len[_FRACTION], '0'))):
 			return True
 		return False
 
@@ -133,3 +141,27 @@ class BigFloat:
 	# Для переопределения метода format
 	def __format__(self, format_spec):
 		return format(str(self), format_spec)
+
+	# генератор сложения (генерирует сбор строки числа)
+	# IN: A - объект первого числа
+	# IN: B - объект второго числа
+	def __add__(self, other):
+		# Вначале нужно найти максимально длинную часть
+		# max_len_int = max(A.len_int, B.len_int)
+		# max_len_frac = max(A.len_frac, B.len_frac)
+		max_len = self.__max_len(other)
+		carry = 0
+		# Генератор результата суммы
+		for x, y in zip(self.extract(*max_len), other.extract(*max_len)):
+			# Если попалась точка дробной части
+			if (x is None and self.comma) or (y is None and other.comma):
+				yield '.'
+			else:
+				sum = str(x + y + carry)
+				carry = 0
+				# если результат сложения с переносом
+				if len(sum) == 2:
+					carry, sum = 1, sum[1]
+				yield sum
+		if carry:
+			yield '1'

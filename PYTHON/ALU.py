@@ -49,8 +49,9 @@ class ALU:
 		# NEWIT замена на очистку АЛУ, которая включает очистку регистра Z
 		self.clear()
 		if op == '+':
-			for digit in self.add(A, B):
-				self.__Z.input(digit, self.__flags)
+			# for digit in (A.value+B.value):# in self.add(A, B):
+			# 	self.__Z.input(digit, self.__flags)
+			self.__Z.value = A.value + B.value
 		elif op == '-':
 			# Тест сравнения
 			# self.compare(A, B)
@@ -90,69 +91,29 @@ class ALU:
 # ---------------------------- Мои методы ---------------------------- #
 
 	# Вычисление максимальных длин целой и дробной частей
-	def __max_len(self, A: Registry, B: Registry):
-		return max(A.len_int, B.len_int), max(A.len_frac, B.len_frac)
+	# def __max_len(self, A: Registry, B: Registry):
+	# 	return max(A.len_int, B.len_int), max(A.len_frac, B.len_frac)
 
 	# генератор сложения (генерирует сбор строки числа)
 	# IN: A - объект первого числа
 	# IN: B - объект второго числа
-	def add(self, A: Registry, B: Registry):
-		# Вначале нужно найти максимально длинную часть
-		# max_len_int = max(A.len_int, B.len_int)
-		# max_len_frac = max(A.len_frac, B.len_frac)
-		max_len = self.__max_len(A, B)
-		carry = 0
-		# Генератор результата суммы
-		for x, y in zip(A.extract(*max_len), B.extract(*max_len)):
-			# Если попалась точка дробной части
-			if (x is None and A.comma) or (y is None and B.comma):
-				yield '.'
-			else:
-				sum = str(x + y + carry)
-				carry = 0
-				# если результат сложения с переносом
-				if len(sum) == 2:
-					carry, sum = 1, sum[1]
-				yield sum
-		if carry:
-			yield '1'
-
-	# NEWIT генератор определения большего и меньшего из операндов
-	# TODO лапшеобразный код. Как уменьшить ???
-	# IN: A - объект первого числа
-	# IN: B - объект второго числа
-	def compare(self, A: Registry, B: Registry):
-		# WARNING предполагается, что нет незначащих нулей в начале числа
-		# это подразумевается логикой программы, но может измениться
-		if A.len_int > B.len_int:
-			self.__bigger = A
-			self.__smaller = B
-			return
-		if A.len_int < B.len_int:
-			self.__bigger = B
-			self.__smaller = A
-			return
-		max_len_int = max(A.len_int, B.len_int)
-		max_len_frac = max(A.len_frac, B.len_frac)
-		# Если длины целых частей равны, то сравниваем в zip-объекте с помощью генераторов
-		# Для начала нужны ссылки на генераторы для возможности их остановки
-		regA = A.extract(max_len_int, max_len_frac)
-		regB = B.extract(max_len_int, max_len_frac)
-		for x, y in zip(regA, regB):
-			# Если попалась точка дробной части
-			if x is None and y is None:
-				pass
-			else:
-				if x > y:
-					self.__bigger = A
-					self.__smaller = B
-					regA.close()
-					regB.close()
-					return
-				if x < y:
-					self.__bigger = B
-					self.__smaller = A
-					regA.close()
-					regB.close()
-					return
-		self.__equal = True
+	# def add(self, A: Registry, B: Registry):
+	# 	# Вначале нужно найти максимально длинную часть
+	# 	# max_len_int = max(A.len_int, B.len_int)
+	# 	# max_len_frac = max(A.len_frac, B.len_frac)
+	# 	max_len = self.__max_len(A, B)
+	# 	carry = 0
+	# 	# Генератор результата суммы
+	# 	for x, y in zip(A.extract(*max_len), B.extract(*max_len)):
+	# 		# Если попалась точка дробной части
+	# 		if (x is None and A.comma) or (y is None and B.comma):
+	# 			yield '.'
+	# 		else:
+	# 			sum = str(x + y + carry)
+	# 			carry = 0
+	# 			# если результат сложения с переносом
+	# 			if len(sum) == 2:
+	# 				carry, sum = 1, sum[1]
+	# 			yield sum
+	# 	if carry:
+	# 		yield '1'

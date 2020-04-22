@@ -143,21 +143,22 @@ class RegistryZ(Registry):
 		return super().value
 	
 	@value.setter
-	def value(self, val):
-		self._value = val
+	def value(self, merger):
+		# self._value = val
 
 	# def input(self, c: str, flags: object, A, B, op):
-	def input(self, c: str, flags: object):
-		if c == '.' and self._value.comma:
-			raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
-		if c == '.':
-			self._value.comma = True
-		elif self._value.comma:
-			self._value.integer = c + self._value.integer
-		# в том числе отсекает ввод незанчащих 0 целой части
-		# TODO ??? заменить self.__integer на len == 0
-		elif self._value.fraction or c != 0:
-			self._value.fraction = c + self._value.fraction
+	# def input(self, c: str, flags: object):
+		for c in merger:
+			if c == '.' and self._value.comma:
+				raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
+			if c == '.':
+				self._value.comma = True
+			elif self._value.comma:
+				self._value.integer = c + self._value.integer
+			# в том числе отсекает ввод незанчащих 0 целой части
+			# TODO ??? заменить self.__integer на len == 0
+			elif self._value.fraction or c != 0:
+				self._value.fraction = c + self._value.fraction
 
 		# print(f"A='{A}'  ({op})  B='{B}'  Z='{self}'"
 		# 		f"  CommaZ={self._value.comma}  CommaA={A.value.comma}"
