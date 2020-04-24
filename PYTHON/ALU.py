@@ -4,10 +4,13 @@ from registers import Registry, RegistryZ
 # Причины:
 # 1) необходимо реализовать математическую логику для 4 действий (+-/*)
 # Реализация:
-# 1) Получить 2 части числа через генератор yield ???
-# Можно будет сразу собирать результат и отдавать, чтобы не хранить его
-# 2) Для этого нужно знать длину каждой части, чтобы выравнивать их
-
+# - [x] Получить 2 части числа через генератор yield
+# - [x] получить длину каждой части, чтобы выравнивать их
+# - [x] реализовать логику для сложения
+# - [ ] реализовать логику для вычитания
+# - [x] нужен метод определения большего и меньшего из двух операндов (регистров)
+# - [ ] реализовать логику для умножения
+# - [ ] реализовать логику для деления
 
 # ------------- АРИФМЕТИЧЕСКО-ЛОГИЧЕСКОЕ УСТРОЙСТВО (АЛУ) ------------ #
 
@@ -18,41 +21,35 @@ class ALU:
 		# Регистр Z определяется через свой конструктор
 		self.__Z = RegistryZ()  # виртуальный регистр АЛУ
 
-
 	# TODO удалить
 	@property
 	def Z(self):
 		return self.__Z
 
-	# TODO очистка АЛУ
+	# очистка АЛУ
 	def clear(self):
 		self.__Z.clear()
-
 
 	# IN: A - ссылка на регистр A
 	# IN: B - ссылка на регистр B
 	# IN: op - обрабатываемая операция
 	def process(self, A: Registry, B: Registry, op: str):
-		# NEWIT очистка регистра перед вычислением (лучше бы после, чтобы не хранить значение)
-		self.__Z.clear()
+		# очистка регистра перед вычислением (лучше бы после, чтобы не хранить значение)
+		# NEWIT замена на очистку АЛУ, которая включает очистку регистра Z
+		self.clear()
 		if op == '+':
-			# NEWIT новое вычисление через генераторы
-			for digit in self.add(A, B):
-				# NEWIT и использование переопределенного метода input для регистра Z
-				self.__Z.input(digit, self.__flags)
+			self.__Z.value = A.value + B.value
 		elif op == '-':
-			self.__Z.value = str(float(A.value) - float(B.value))
+			self.__Z.value = A.value - B.value
 		elif op == '/':
 			self.__Z.value = str(float(A.value) / float(B.value))
 		elif op == '*':
 			self.__Z.value = str(float(A.value) * float(B.value))
 		else:
 			return  # нет операции
-		# KILLME Убрать в будущем (используется временно, т.к. не все операции реализуются через input)
-		if self.__Z.value.find('.') != -1:
-			self.__Z.comma = True
-		# NEWIT очистка от незначащих нулей используется в любом случае
-		self.__Z.prepare()
+		# TODO возможно, нужно будет очищать незначащие 0 целой части
+		# NEWIT удаление незначащих нулей дробной части
+		self.__Z.truncate()
 		# выбор алгоритма вывода результатов
 		# если нажата "равно" и операция не завершена
 		if self.__flags.IS_B_op_A:
@@ -74,26 +71,4 @@ class ALU:
 		else:
 			raise Exception("ALU: unknown flags combination")
 
-	# NEWIT генератор сложения (генерирует сбор строки числа)
-	# IN: A - объект первого числа
-	# IN: B - объект второго числа
-	def add(self, A: Registry, B: Registry):
-		# Вначале нужно найти максимально длинную часть
-		max_len_int = max(A.len_int, B.len_int)
-		max_len_frac = max(A.len_frac, B.len_frac)
-		carry = 0
-		# Генератор результата суммы
-		for x, y in zip(A.extract(max_len_int, max_len_frac),
-						B.extract(max_len_int, max_len_frac)):
-			# Если попалась точка дробной части
-			if x is None and y is None:
-				yield '.'
-			else:
-				sum = str(x + y + carry)
-				carry = 0
-				# если результат сложения с переносом
-				if len(sum) == 2:
-					carry, sum = 1, sum[1]
-				yield sum
-		if carry:
-			yield '1'
+# ---------------------------- Мои методы ---------------------------- #

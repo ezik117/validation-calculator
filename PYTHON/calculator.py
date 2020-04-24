@@ -10,7 +10,7 @@ from registers import Registry
 import flags
 import ALU
 
-
+# FIXME ТЗ устарело
 # TODO реконструкция калькулятора
 # Реализация:
 # - [x] добавить возможность ввода точки для дробных величин
@@ -56,7 +56,7 @@ class Calculator:
 		elif self.mode == 2:
 			print("\r" + " "*80, end="")
 			print("\r" + self.A, end='')
-		# NEWIT изменился вид вывода (для возможности добавления новых значений)
+		# изменился вид вывода (для возможности добавления новых значений)
 		elif self.mode == 3:
 			return (f"A='{self.A}'  ({self.OP})  B='{self.B}'"
 				f"  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}")
@@ -69,13 +69,17 @@ class Calculator:
 			self.A.BS()
 		else:	
 			self.A.input(c, self.flags)
-			self.flags.ENABLE_REG_FILLING
+			# NEWIT флаг заполнения регистра устанавливается, если 0 не является первым
+			if self.flags.IS_NEW_INPUT and c != '0':
+				self.flags.ENABLE_REG_FILLING
 
 	# нажата арифметическая клавиша - обработаем
 	# IN: с - символ нажатой клавиши
 	def pressedOpcode(self, c: str):
 		self.flags.EQUAL_NOT_PRESSED
-		self.A.prepare()
+		# NEWIT опять вводим метод для обрезки незначащих 0 дробной части
+		# альтернатива - паттерн наблюдатель, но он громоздок для этого случая
+		self.A.truncate()
 		if self.flags.IS_OPERATON_POSSIBLE:
 			self.__ALU.process(self.B, self.A, self.OP)
 		self.B.copyFrom(self.A)
@@ -86,7 +90,7 @@ class Calculator:
 	# нажата клавиша "равно" - обработаем
 	def pressedEqual(self):
 		self.flags.EQUAL_PRESSED
-		self.A.prepare()
+		self.A.truncate()
 		if self.flags.IS_OPS_CONTINUES:
 			self.__ALU.process(self.B, self.A, self.OP)
 		else:

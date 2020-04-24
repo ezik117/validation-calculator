@@ -55,15 +55,15 @@ class TestFlags():
 	# @pytest.mark.skip()
 	def test_input_first_op(self):
 		calc = self.test_BS()
-		calc.pressedOpcode('+')
-		assert "A='54.4'  (+)  B='54.4'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
+		calc.pressedOpcode('-')
+		assert "A='54.4'  (-)  B='54.4'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
 		calc.pressedDigitalKey('1')
 		calc.pressedDigitalKey('2')
-		assert "A='12'  (+)  B='54.4'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
+		assert "A='12'  (-)  B='54.4'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
 		calc.pressedDigitalKey('.')
 		calc.pressedDigitalKey('1')
-		calc.pressedDigitalKey('2')
-		assert "A='12.12'  (+)  B='54.4'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
+		# calc.pressedDigitalKey('2')
+		assert "A='12.1'  (-)  B='54.4'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
 		return calc
 
 	# нажатие равно
@@ -71,7 +71,7 @@ class TestFlags():
 	def test_press_equal(self):
 		calc = self.test_input_first_op()
 		calc.pressedEqual()
-		assert "A='54.4'  (+)  B='66.52'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='54.4'  (-)  B='42.3'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		return calc
 
 	# проверка ввода операции после ввода первого числа
@@ -79,30 +79,30 @@ class TestFlags():
 	# @pytest.mark.skip()
 	def test_continuos_ops(self):
 		calc = self.test_input_first_op()
-		calc.pressedOpcode('+')
-		assert "A='66.52'  (+)  B='66.52'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
+		calc.pressedOpcode('-')
+		assert "A='42.3'  (-)  B='42.3'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
 		calc.pressedDigitalKey('1')
-		assert "A='1'  (+)  B='66.52'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
+		assert "A='1'  (-)  B='42.3'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
 		calc.pressedDigitalKey('0')
-		assert "A='10'  (+)  B='66.52'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
-		# Дроби портятся пока нереализованной операцией "-"
-		calc.pressedOpcode('+')
-		assert ("A='76.52'  (+)  B='76.52'  EQ=0  CD=1  CONST=1") == calc.displayRegisters()
+		assert "A='10'  (-)  B='42.3'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
+		calc.pressedOpcode('-')
+		assert ("A='32.3'  (-)  B='32.3'  EQ=0  CD=1  CONST=1") == calc.displayRegisters()
 		calc.pressedDigitalKey('2')
-		assert ("A='2'  (+)  B='76.52'  EQ=0  CD=0  CONST=1") == calc.displayRegisters()
+		assert ("A='2'  (-)  B='32.3'  EQ=0  CD=0  CONST=1") == calc.displayRegisters()
 		calc.pressedEqual()
-		assert ("A='76.52'  (+)  B='78.52'  EQ=1  CD=1  CONST=0") == calc.displayRegisters()
+		assert ("A='32.3'  (-)  B='30.3'  EQ=1  CD=1  CONST=0") == calc.displayRegisters()
 
 	# последовательный ввод "равно" после ввода 2 чисел и одной операции
 	# @pytest.mark.skip()
 	def test_continuos_equal(self):
+		# WARNING пока не учитывается знак числа, только механика процесса
 		calc = self.test_press_equal()
 		calc.pressedEqual()
-		assert "A='120.92'  (+)  B='66.52'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='12.1'  (-)  B='42.3'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		calc.pressedEqual()
-		assert "A='187.44'  (+)  B='66.52'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='30.2'  (-)  B='42.3'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		calc.pressedEqual()
-		assert "A='253.96'  (+)  B='66.52'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='12.1'  (-)  B='42.3'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		return calc
 
 	# тест нажатия клавиши ESC "очистка"
