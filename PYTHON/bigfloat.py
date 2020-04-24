@@ -79,7 +79,6 @@ class BigFloat:
 		for digit in self.__fraction[::-1]:
 			yield int(digit)
 		# 3) точка
-		# if self.__comma:
 		# NEWIT отправляется как маркер-разделитель целой и дробной части,
 		# но наличие точки проверяется в методах АЛУ
 		yield None
@@ -145,23 +144,35 @@ class BigFloat:
 	# генератор сложения (генерирует сбор строки числа)
 	# IN: A - объект первого числа
 	# IN: B - объект второго числа
-	def __add__(self, other):
+	def __operation(self, other, op):
 		# Вначале нужно найти максимально длинную часть
-		# max_len_int = max(A.len_int, B.len_int)
-		# max_len_frac = max(A.len_frac, B.len_frac)
 		max_len = self.__max_len(other)
+		if op == '-' and self < other:
+			first = other.extract(*max_len)
+			second = self.extract(*max_len)
+		else:
+			first = self.extract(*max_len)
+			second = other.extract(*max_len)
 		carry = 0
+		pref = 1 if op == '+' else -1
 		# Генератор результата суммы
-		for x, y in zip(self.extract(*max_len), other.extract(*max_len)):
+		for x, y in zip(first, second):
 			# Если попалась точка дробной части
 			if (x is None and self.comma) or (y is None and other.comma):
 				yield '.'
 			else:
-				sum = str(x + y + carry)
+				sum = str(x + pref * y + pref * carry)
 				carry = 0
 				# если результат сложения с переносом
 				if len(sum) == 2:
-					carry, sum = 1, sum[1]
+					carry = 1
+					sum = sum[1] if op == '+' else str(10 + int(sum))
 				yield sum
-		if carry:
+		if op == '+' and carry:
 			yield '1'
+
+	def __add__(self, other):
+		return self.__operation(other, '+')
+
+	def __sub__(self, other):
+		return self.__operation(other, '-')
