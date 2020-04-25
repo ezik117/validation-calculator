@@ -18,6 +18,9 @@ class BigFloat:
 		self.__fraction = ''
 		# используется как переход от дробной к целой части и наоборот (для BS и input)
 		self.__comma = False
+		# NEWIT знак числа: "-" - отрицательное число, интерпретируется как True
+		# "" - положительное число, интерпретируется как False (пустая строка)
+		self.__sign = ''
 
 # ----------------------------- Свойства ----------------------------- #
 
@@ -99,6 +102,15 @@ class BigFloat:
 	def __max_len(self, other):
 		return max(self.len_int, other.len_int), max(self.len_frac, other.len_frac)
 
+	# NEWIT Конвертирование типов int и float в BigFloat для сравнения
+	def __convert_type(self, other):
+		X = BigFloat()
+		if '.' in str(other): X.comma = True
+		X.integer, *X.fraction = str(other).split('.')
+		X.integer = X.integer.lstrip('0')
+		X.fraction = X.fraction[0].rstrip('0') if X.fraction else ''
+		return X
+
 # ------------------------ Специальные методы ------------------------ #
 
 	# Длина числа как длины целой и дробной части плюс 1 позиция точки (для совместимости с Registry)
@@ -107,23 +119,49 @@ class BigFloat:
 	
 	# Метод равенства можно реализовать простым способом
 	def __eq__(self, other):
+		# NEWIT сравнение BigFloat с int и float
+		if type(other) is int or type(other) is float:
+			# ISSUE пока без проверки знака числа
+			other = self.__convert_type(other)
 		return self.integer == other.integer and self.fraction == other.fraction
 
 	# Неравенство таким же способом не удается реализовать, т.к. требуется выравнивание
 	def __lt__(self, other):
+		# NEWIT сравнение BigFloat с int и float
+		if type(other) is int or type(other) is float:
+			other = self.__convert_type(other)
 		max_len = self.__max_len(other)
 		if (self.__integer.zfill(max_len[_INTEGER])
-				< other.__integer.zfill(max_len[_INTEGER])):
+				< other.integer.zfill(max_len[_INTEGER])):
 			return True
 		if ((self.__integer.zfill(max_len[_INTEGER])
-					== other.__integer.zfill(max_len[_INTEGER]))
+					== other.integer.zfill(max_len[_INTEGER]))
 				and (self.__fraction.ljust(max_len[_FRACTION], '0')
-					< other.__fraction.ljust(max_len[_FRACTION], '0'))):
+					< other.fraction.ljust(max_len[_FRACTION], '0'))):
 			return True
 		return False
 
 	def __le__(self, other):
 		return self == other or self < other
+
+	# NEWIT из-за приведения типов необходимо реализовать все варианты сравнения
+	def __gt__(self, other):
+		if type(other) is int or type(other) is float:
+			other = self.__convert_type(other)
+		max_len = self.__max_len(other)
+		if (self.__integer.zfill(max_len[_INTEGER])
+				> other.integer.zfill(max_len[_INTEGER])):
+			return True
+		if ((self.__integer.zfill(max_len[_INTEGER])
+					== other.integer.zfill(max_len[_INTEGER]))
+				and (self.__fraction.ljust(max_len[_FRACTION], '0')
+					> other.fraction.ljust(max_len[_FRACTION], '0'))):
+			return True
+		return False
+
+	def __ge__(self, other):
+		return self == other or self > other
+
 
 	# Строковое представление:
 	# 1) если ничего не введено, то выводит 0
@@ -132,10 +170,12 @@ class BigFloat:
 	# 4) если дробной части нет, но есть точка, показывает "х.0" или "0.0"
 	def __str__(self):
 		comma = '.' if self.comma else ''
+		# NEWIT вывод знака числа
+		sign = '-' if self.__sign else ''
 		integer = '0' if self.comma and not self.__integer else self.__integer
 		frac = '0' if self.comma and not self.__fraction else self.__fraction
 		# если нужен ноль с точкой, можно переделать
-		return (integer + comma + frac) if len(self) else '0'
+		return (sign + integer + comma + frac) if len(self) else '0'
 
 	# Для переопределения метода format
 	def __format__(self, format_spec):
