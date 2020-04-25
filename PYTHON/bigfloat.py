@@ -158,8 +158,11 @@ class BigFloat:
 		# Генератор результата суммы
 		for x, y in zip(first, second):
 			# Если попалась точка дробной части
-			if (x is None and self.comma) or (y is None and other.comma):
-				yield '.'
+			# BUG когда оба числа - целые
+			# if (x is None and self.comma) or (y is None and other.comma):
+			if x is None and y is None:
+				yield ('.' if self.comma or other.comma else '')
+				# yield '.'
 			else:
 				sum = str(x + pref * y + pref * carry)
 				carry = 0
