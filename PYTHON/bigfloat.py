@@ -33,6 +33,15 @@ class BigFloat:
 	def comma(self, val):
 		self.__comma = val
 
+	# Знак числа
+	@property
+	def sign(self):
+		return self.__sign
+	
+	@sign.setter
+	def sign(self, val):
+		self.__sign = val
+
 	# свойства частей длины
 	@property
 	def len_int(self):
@@ -105,6 +114,12 @@ class BigFloat:
 	# NEWIT Конвертирование типов int и float в BigFloat для сравнения
 	def __convert_type(self, other):
 		X = BigFloat()
+		if str(other)[0] == '-':
+			X.sign = '-'
+			other = str(other)[1:]
+		if str(other)[0] == '+':
+			X.sign = ''
+			other = str(other)[1:]
 		if '.' in str(other): X.comma = True
 		X.integer, *X.fraction = str(other).split('.')
 		X.integer = X.integer.lstrip('0')
@@ -123,23 +138,27 @@ class BigFloat:
 		if type(other) is int or type(other) is float:
 			# ISSUE пока без проверки знака числа
 			other = self.__convert_type(other)
-		return self.integer == other.integer and self.fraction == other.fraction
+		if self.sign == other.sign:
+			return self.integer == other.integer and self.fraction == other.fraction
+		return False
 
 	# Неравенство таким же способом не удается реализовать, т.к. требуется выравнивание
 	def __lt__(self, other):
 		# NEWIT сравнение BigFloat с int и float
 		if type(other) is int or type(other) is float:
 			other = self.__convert_type(other)
+		if self.sign != other.sign:
+			return (True if self.sign else False)
 		max_len = self.__max_len(other)
-		if (self.__integer.zfill(max_len[_INTEGER])
+		if (self.integer.zfill(max_len[_INTEGER])
 				< other.integer.zfill(max_len[_INTEGER])):
-			return True
-		if ((self.__integer.zfill(max_len[_INTEGER])
+			return (True if not self.sign else False)
+		if ((self.integer.zfill(max_len[_INTEGER])
 					== other.integer.zfill(max_len[_INTEGER]))
-				and (self.__fraction.ljust(max_len[_FRACTION], '0')
+				and (self.fraction.ljust(max_len[_FRACTION], '0')
 					< other.fraction.ljust(max_len[_FRACTION], '0'))):
-			return True
-		return False
+			return (True if not self.sign else False)
+		return (False if not self.sign else True)
 
 	def __le__(self, other):
 		return self == other or self < other
@@ -148,16 +167,18 @@ class BigFloat:
 	def __gt__(self, other):
 		if type(other) is int or type(other) is float:
 			other = self.__convert_type(other)
+		if self.sign != other.sign:
+			return (True if not self.sign else False)
 		max_len = self.__max_len(other)
-		if (self.__integer.zfill(max_len[_INTEGER])
+		if (self.integer.zfill(max_len[_INTEGER])
 				> other.integer.zfill(max_len[_INTEGER])):
-			return True
-		if ((self.__integer.zfill(max_len[_INTEGER])
+			return (True if not self.sign else False)
+		if ((self.integer.zfill(max_len[_INTEGER])
 					== other.integer.zfill(max_len[_INTEGER]))
-				and (self.__fraction.ljust(max_len[_FRACTION], '0')
+				and (self.fraction.ljust(max_len[_FRACTION], '0')
 					> other.fraction.ljust(max_len[_FRACTION], '0'))):
-			return True
-		return False
+			return (True if not self.sign else False)
+		return (False if not self.sign else True)
 
 	def __ge__(self, other):
 		return self == other or self > other
@@ -191,10 +212,15 @@ class BigFloat:
 			first = other.extract(*max_len)
 			second = self.extract(*max_len)
 		else:
+			# TODO если в '+' число отрицательное, то результат отрицательный
+			# sign = self.sign
 			first = self.extract(*max_len)
 			second = other.extract(*max_len)
 		carry = 0
+		# NEWIT зависиомсть формулы расчета от типа операции
 		pref = 1 if op == '+' else -1
+		# NEWIT имитация знака числа для настройки генератора
+		sign = ''
 		# Генератор результата суммы
 		for x, y in zip(first, second):
 			# Если попалась точка дробной части
@@ -213,9 +239,18 @@ class BigFloat:
 				yield sum
 		if op == '+' and carry:
 			yield '1'
+		# NEWIT в конце надо отправить знак числа (для регистра Z)
+		yield sign
 
 	def __add__(self, other):
+		# NEWIT выбор в зависимости от знака числа
+		# if self.sign != other.sign:
+			# если знаки разные, то это вычитание
+			# return self.__operation(other, '-')
+		# иначе - сложение, знак определяем в __operation
 		return self.__operation(other, '+')
 
 	def __sub__(self, other):
+		# if self.sign != other.sign:
+		# 	return self.__operation(other, '+')
 		return self.__operation(other, '-')

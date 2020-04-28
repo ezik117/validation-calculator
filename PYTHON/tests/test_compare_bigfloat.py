@@ -71,7 +71,7 @@ class TestBigFloat():
 		assert number < number2
 
 	# проверка специального метода __le__
-	def test_lower_than__equal_method(self):
+	def test_lower_than_equal_method(self):
 		number = self.test_call()
 		number2 = bigfloat.BigFloat()
 		number2.integer = '100'
@@ -83,6 +83,7 @@ class TestBigFloat():
 		number3.comma = True
 		number3.fraction = '1'
 		# num2 и num3 равны
+		assert number2 == number3
 		assert number2 <= number3
 		assert number2 >= number3
 		# num3 больше num
@@ -106,6 +107,7 @@ class TestBigFloat():
 		assert number == 0.0
 
 	# сравнение неравенства BigFloat с числами типов int и float
+	# @pytest.mark.skip()
 	def test_lower_than_equal_with_number_method(self):
 		number = self.test_call()
 		# сравнение с числом number == 54.27
@@ -125,3 +127,70 @@ class TestBigFloat():
 		assert number > 0.0
 		assert number >= 0
 		assert number >= 0.0
+
+	# тест сравнения отрицательных чисел
+	def test_equal_negative_number(self):
+		number = self.test_call()
+		# number == -54.27
+		number.sign = '-'
+		# number2 == 100.1
+		number2 = bigfloat.BigFloat()
+		number2.integer = '100'
+		number2.comma = True
+		number2.fraction = '1'
+		assert not (number == number2)
+		assert number < number2
+		assert number <= number2
+		# number2 == -100.1
+		number2.sign = '-'
+		assert not (number == number2)
+		assert number > number2
+		assert number >= number2
+		# number = -100.1
+		number.integer = '100'
+		number.fraction = '1'
+		assert number == number2
+		# number = 0
+		number.integer = ''
+		number.fraction = ''
+		number.comma = False
+		number.sign = ''
+		assert number > number2
+		assert number >= number2
+
+	# сравнение неравенства BigFloat с числами типов int и float
+	# @pytest.mark.skip()
+	def test_lower_than_equal_with_negative_number_method(self):
+		number = self.test_call()
+		# сравнение с числом number == -54.27
+		number.sign = '-'
+		assert number >= -55
+		assert number > -55
+		assert number >= -55.0
+		assert number > -55.0
+		assert number >= -54.28
+		assert number > -54.28
+		assert number <= -54
+		assert number < -54
+		assert number < -54.26
+		assert number <= -54.26
+		assert number < -54.0
+		assert number <= -54.0
+		assert number < 0
+		assert number < 0.0
+		assert number <= 0
+		assert number <= 0.0
+
+	# проверка специального метода сравнения __eq__ с учетом знака
+	# @pytest.mark.skip()
+	def test_equal_method(self):
+		number = self.test_call()
+		number.sign = '-'
+		number2 = bigfloat.BigFloat()
+		number2.integer = '54'
+		number2.comma = True
+		number2.fraction = '27'
+		number2.sign = '-'
+		assert number == number2
+		assert number == -54.27
+		assert number2 == -54.27

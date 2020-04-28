@@ -151,7 +151,9 @@ class RegistryZ(Registry):
 		for c in merger:
 			if c == '.' and self._value.comma:
 				raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
-			if c == '.':
+			if c == '-' or c == '':
+				self._value.sign = c
+			elif c == '.':
 				self._value.comma = True
 			elif self._value.comma:
 				self._value.integer = c + self._value.integer

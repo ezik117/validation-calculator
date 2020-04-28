@@ -37,6 +37,7 @@ class ALU:
 		# очистка регистра перед вычислением (лучше бы после, чтобы не хранить значение)
 		# NEWIT замена на очистку АЛУ, которая включает очистку регистра Z
 		self.clear()
+		# print(A.value.convert_type(-55))
 		if op == '+':
 			self.__Z.value = A.value + B.value
 		elif op == '-':
