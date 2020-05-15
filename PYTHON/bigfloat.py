@@ -82,23 +82,30 @@ class BigFloat:
 
 	# IN: max_int - максимальная длина целой части числа из двух
 	# IN: max_frac - максимальная длина дробной части числа из двух
-	def extract(self, max_int: int = 0, max_frac: int = 0):
-		# Начинаем с конца
+	# IN: first - направление обхода числа (True - обход с начала, False - обход с конца)
+	def extract(self, max_int: int = 0, max_frac: int = 0, first: bool = False):
+		# NEWIT Определяем переменные для обхода
+		max_diff = max_frac - self.len_frac, max_int - self.len_int
+		num_parts = self.__fraction, self.__integer
+		# 0) знак числа в прямом порядке (только для методов сравнения)
+		if first:
+			yield self.sign
 		# 1) коррекция дробной части (len_frac либо равна, либо меньше max_frac)
-		for _ in range(max_frac - self.len_frac):
+		for _ in range(max_diff[first]):
 			yield 0
 		# 2) генерирование дробной части
-		for digit in self.__fraction[::-1]:
+		for digit in (num_parts[first][::(1 if first else -1)]):
 			yield int(digit)
 		# 3) точка
 		# NEWIT отправляется как маркер-разделитель целой и дробной части,
 		# но наличие точки проверяется в методах АЛУ
-		yield None
+		if not first:
+			yield None
 		# 4) генерирование целой части
-		for digit in self.__integer[::-1]:
+		for digit in (num_parts[not first][::(1 if first else -1)]):
 			yield int(digit)
 		# 5) коррекция целой части (аналогично дробной (1))
-		for _ in range(max_int - self.len_int):
+		for _ in range(max_diff[not first]):
 			yield 0
 
 	# Обрезка незначащих нулей дробной части
@@ -118,7 +125,6 @@ class BigFloat:
 			X.sign = '-'
 			other = str(other)[1:]
 		if str(other)[0] == '+':
-			X.sign = ''
 			other = str(other)[1:]
 		if '.' in str(other): X.comma = True
 		X.integer, *X.fraction = str(other).split('.')
@@ -147,18 +153,27 @@ class BigFloat:
 		# NEWIT сравнение BigFloat с int и float
 		if type(other) is int or type(other) is float:
 			other = self.__convert_type(other)
-		if self.sign != other.sign:
-			return (True if self.sign else False)
 		max_len = self.__max_len(other)
-		if (self.integer.zfill(max_len[_INTEGER])
-				< other.integer.zfill(max_len[_INTEGER])):
-			return (True if not self.sign else False)
-		if ((self.integer.zfill(max_len[_INTEGER])
-					== other.integer.zfill(max_len[_INTEGER]))
-				and (self.fraction.ljust(max_len[_FRACTION], '0')
-					< other.fraction.ljust(max_len[_FRACTION], '0'))):
-			return (True if not self.sign else False)
-		return (False if not self.sign else True)
+		first = self.extract(*max_len, True)
+		second = other.extract(*max_len, True)
+		# minus = False
+		for x, y in zip(first, second):
+			if x != y:
+				first.close()
+				second.close()
+			# вывод знака скоординирован в extract
+			if x in ['-', '']:
+				if x == y:
+					minus = True if x else False
+				else:
+					return x > y
+			else:
+				if x > y:
+					return False ^ minus
+				elif x < y:
+					return True ^ minus
+		# конец генерации чисел (значит они равны)
+		return False
 
 	def __le__(self, other):
 		return self == other or self < other
@@ -167,18 +182,27 @@ class BigFloat:
 	def __gt__(self, other):
 		if type(other) is int or type(other) is float:
 			other = self.__convert_type(other)
-		if self.sign != other.sign:
-			return (True if not self.sign else False)
 		max_len = self.__max_len(other)
-		if (self.integer.zfill(max_len[_INTEGER])
-				> other.integer.zfill(max_len[_INTEGER])):
-			return (True if not self.sign else False)
-		if ((self.integer.zfill(max_len[_INTEGER])
-					== other.integer.zfill(max_len[_INTEGER]))
-				and (self.fraction.ljust(max_len[_FRACTION], '0')
-					> other.fraction.ljust(max_len[_FRACTION], '0'))):
-			return (True if not self.sign else False)
-		return (False if not self.sign else True)
+		first = self.extract(*max_len, True)
+		second = other.extract(*max_len, True)
+		# minus = False
+		for x, y in zip(first, second):
+			if x != y:
+				first.close()
+				second.close()
+			# вывод знака скоординирован в extract
+			if x in ['-', '']:
+				if x == y:
+					minus = True if x else False
+				else:
+					return x < y
+			else:
+				if x < y:
+					return False ^ minus
+				elif x > y:
+					return True ^ minus
+		# конец генерации чисел (значит они равны)
+		return False
 
 	def __ge__(self, other):
 		return self == other or self > other

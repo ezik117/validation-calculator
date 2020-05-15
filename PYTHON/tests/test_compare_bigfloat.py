@@ -71,6 +71,7 @@ class TestBigFloat():
 		assert number < number2
 
 	# проверка специального метода __le__
+	# @pytest.mark.skip()
 	def test_lower_than_equal_method(self):
 		number = self.test_call()
 		number2 = bigfloat.BigFloat()
@@ -129,6 +130,7 @@ class TestBigFloat():
 		assert number >= 0.0
 
 	# тест сравнения отрицательных чисел
+	# @pytest.mark.skip()
 	def test_equal_negative_number(self):
 		number = self.test_call()
 		# number == -54.27
