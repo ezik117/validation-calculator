@@ -7,6 +7,9 @@
 
 class BigFloat:
 
+	# NEWIT Атрибуты класса
+	__STRAIGHT, __INVERSE = 1, -1
+
 	def __init__(self):
 		# Значение числа (строка, хотя можно сделать любой объект - список, файл)
 		# TODO попробуем хранить, как и раньше, отдельно целую и дробную части
@@ -80,29 +83,30 @@ class BigFloat:
 	# IN: max_int - максимальная длина целой части числа из двух
 	# IN: max_frac - максимальная длина дробной части числа из двух
 	# IN: first - направление обхода числа (True - обход с начала, False - обход с конца)
-	def extract(self, max_int: int = 0, max_frac: int = 0, first: bool = False):
-		# NEWIT Определяем переменные для обхода
-		max_diff = max_frac - self.len_frac, max_int - self.len_int
-		num_parts = self.__fraction, self.__integer
+	def extract(self, max_int: int = 0, max_frac: int = 0, direct: int = __INVERSE):
+		# NEWIT Определяем переменные для обхода (кортежи, из которых выбираются
+		# данные согласно направлению обхода direct)
+		max_diff = None, max_int - self.len_int, max_frac - self.len_frac
+		num_parts = None, self.__integer, self.__fraction
 		# 0) знак числа в прямом порядке (только для методов сравнения)
-		if first:
+		if direct == 1:
 			yield self.sign
 		# 1) коррекция дробной части (len_frac либо равна, либо меньше max_frac)
-		for _ in range(max_diff[first]):
+		for _ in range(max_diff[direct]):
 			yield 0
 		# 2) генерирование дробной части
-		for digit in (num_parts[first][::(1 if first else -1)]):
+		for digit in (num_parts[direct][::direct]):
 			yield int(digit)
 		# 3) точка
 		# NEWIT отправляется как маркер-разделитель целой и дробной части,
 		# но наличие точки проверяется в методах АЛУ
-		if not first:
+		if direct == -1:
 			yield None
 		# 4) генерирование целой части
-		for digit in (num_parts[not first][::(1 if first else -1)]):
+		for digit in (num_parts[-direct][::direct]):
 			yield int(digit)
 		# 5) коррекция целой части (аналогично дробной (1))
-		for _ in range(max_diff[not first]):
+		for _ in range(max_diff[-direct]):
 			yield 0
 
 	# Обрезка незначащих нулей дробной части
@@ -151,8 +155,8 @@ class BigFloat:
 		if type(other) is int or type(other) is float:
 			other = self.__convert_type(other)
 		max_len = self.__max_len(other)
-		first = self.extract(*max_len, True)
-		second = other.extract(*max_len, True)
+		first = self.extract(*max_len, BigFloat.__STRAIGHT)
+		second = other.extract(*max_len, BigFloat.__STRAIGHT)
 		# minus = False
 		for x, y in zip(first, second):
 			if x != y:
@@ -165,10 +169,10 @@ class BigFloat:
 				else:
 					return x > y
 			else:
-				if x > y:
-					return False ^ minus
-				elif x < y:
-					return True ^ minus
+				if x == y:
+					continue
+				else:
+					return (x < y) ^ minus
 		# конец генерации чисел (значит они равны)
 		return False
 
@@ -180,8 +184,8 @@ class BigFloat:
 		if type(other) is int or type(other) is float:
 			other = self.__convert_type(other)
 		max_len = self.__max_len(other)
-		first = self.extract(*max_len, True)
-		second = other.extract(*max_len, True)
+		first = self.extract(*max_len, BigFloat.__STRAIGHT)
+		second = other.extract(*max_len, BigFloat.__STRAIGHT)
 		# minus = False
 		for x, y in zip(first, second):
 			if x != y:
@@ -194,10 +198,10 @@ class BigFloat:
 				else:
 					return x < y
 			else:
-				if x < y:
-					return False ^ minus
-				elif x > y:
-					return True ^ minus
+				if x == y:
+					continue
+				else:
+					return (x > y) ^ minus
 		# конец генерации чисел (значит они равны)
 		return False
 

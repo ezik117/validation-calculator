@@ -120,9 +120,10 @@ class Registry:
 
 	# IN: max_int - максимальная длина целой части числа из двух
 	# IN: max_frac - максимальная длина дробной части числа из двух
-	def extract(self, max_int: int=0, max_frac: int=0):
+	# WARNING не используется?
+	# def extract(self, max_int: int=0, max_frac: int=0):
 		# NEWIT пока используем ссылку на extract из BigFloat
-		return self._value.extract(max_int, max_frac)
+		# return self._value.extract(max_int, max_frac)
 
 # ------------------------ Специальные методы ------------------------ #
 
