@@ -5,9 +5,6 @@
 # ОПИСАНИЕ:  Описывает класс больших чисел, используемых в регистрах
 # *****************************************************************************
 
-# Константы доступа к кортежу значений максимальных длин
-_INTEGER, _FRACTION = range(2)
-
 class BigFloat:
 
 	def __init__(self):
@@ -17,7 +14,7 @@ class BigFloat:
 		self.__integer = ''
 		self.__fraction = ''
 		# используется как переход от дробной к целой части и наоборот (для BS и input)
-		self.__comma = False
+		self.__comma = ''
 		# NEWIT знак числа: "-" - отрицательное число, интерпретируется как True
 		# "" - положительное число, интерпретируется как False (пустая строка)
 		self.__sign = ''
@@ -75,7 +72,7 @@ class BigFloat:
 		if self.__fraction:
 			self.__fraction = self.__fraction[:-1]
 		elif self.comma:
-			self.__comma = False
+			self.__comma = ''
 		elif self.__integer:
 			self.__integer = self.__integer[:-1]
 		# если нет никаких значений, то не делаем ничего
@@ -126,7 +123,7 @@ class BigFloat:
 			other = str(other)[1:]
 		if str(other)[0] == '+':
 			other = str(other)[1:]
-		if '.' in str(other): X.comma = True
+		if '.' in str(other): X.comma = '.'
 		X.integer, *X.fraction = str(other).split('.')
 		X.integer = X.integer.lstrip('0')
 		X.fraction = X.fraction[0].rstrip('0') if X.fraction else ''
@@ -136,7 +133,7 @@ class BigFloat:
 
 	# Длина числа как длины целой и дробной части плюс 1 позиция точки (для совместимости с Registry)
 	def __len__(self):
-		return len(self.__integer) + int(self.__comma) + len(self.__fraction)
+		return len(self.__integer) + len(self.__comma) + len(self.__fraction)
 	
 	# Метод равенства можно реализовать простым способом
 	def __eq__(self, other):
@@ -214,13 +211,14 @@ class BigFloat:
 	# 3) если введена точка, показывает дробное число
 	# 4) если дробной части нет, но есть точка, показывает "х.0" или "0.0"
 	def __str__(self):
-		comma = '.' if self.comma else ''
+		# comma = '.' if self.comma else ''
 		# NEWIT вывод знака числа
-		sign = '-' if self.__sign else ''
-		integer = '0' if self.comma and not self.__integer else self.__integer
+		# sign = '-' if self.__sign else ''
+		# integer = '0' if self.comma and not self.__integer else self.__integer
+		integer = self.__integer if self.__integer else '0'
 		frac = '0' if self.comma and not self.__fraction else self.__fraction
 		# если нужен ноль с точкой, можно переделать
-		return (sign + integer + comma + frac) if len(self) else '0'
+		return self.sign + integer + self.comma + frac
 
 	# Для переопределения метода format
 	def __format__(self, format_spec):

@@ -28,7 +28,7 @@ class TestBigFloat():
 		assert '5' == str(number)
 		number.integer = '54'
 		assert '54' == str(number)
-		number.comma = True
+		number.comma = '.'
 		assert '54.0' == str(number)
 		number.fraction = '2'
 		assert '54.2' == str(number)
@@ -42,17 +42,17 @@ class TestBigFloat():
 		number = self.test_call()
 		number2 = bigfloat.BigFloat()
 		number2.integer = '100'
-		number2.comma = True
+		number2.comma = '.'
 		number2.fraction = '1'
 		assert not (number == number2)
 		number3 = bigfloat.BigFloat()
 		number3.integer = '100'
-		number3.comma = True
+		number3.comma = '.'
 		number3.fraction = '1'
 		assert number2 == number3
 		number2 = bigfloat.BigFloat()
 		number2.integer = '100'
-		number2.comma = True
+		number2.comma = '.'
 		number2.fraction = '1'
 		number2.BS()
 		number2.BS()
@@ -66,7 +66,7 @@ class TestBigFloat():
 		number = self.test_call()
 		number2 = bigfloat.BigFloat()
 		number2.integer = '100'
-		number2.comma = True
+		number2.comma = '.'
 		number2.fraction = '1'
 		assert number < number2
 
@@ -76,12 +76,12 @@ class TestBigFloat():
 		number = self.test_call()
 		number2 = bigfloat.BigFloat()
 		number2.integer = '100'
-		number2.comma = True
+		number2.comma = '.'
 		number2.fraction = '1'
 		assert number <= number2
 		number3 = bigfloat.BigFloat()
 		number3.integer = '100'
-		number3.comma = True
+		number3.comma = '.'
 		number3.fraction = '1'
 		# num2 и num3 равны
 		assert number2 == number3
@@ -97,13 +97,13 @@ class TestBigFloat():
 		assert not (number == 100)
 		number.integer = '100'
 		number.fraction = ''
-		number.comma = False
+		number.comma = ''
 		assert number == 100
 		assert number == 100.0
 		number.integer = ''
 		assert number == 0
 		assert number == 0.0
-		number.comma = True
+		number.comma = '.'
 		assert number == 0
 		assert number == 0.0
 
@@ -138,7 +138,7 @@ class TestBigFloat():
 		# number2 == 100.1
 		number2 = bigfloat.BigFloat()
 		number2.integer = '100'
-		number2.comma = True
+		number2.comma = '.'
 		number2.fraction = '1'
 		assert not (number == number2)
 		assert number < number2
@@ -155,7 +155,7 @@ class TestBigFloat():
 		# number = 0
 		number.integer = ''
 		number.fraction = ''
-		number.comma = False
+		number.comma = ''
 		number.sign = ''
 		assert number > number2
 		assert number >= number2
@@ -190,7 +190,7 @@ class TestBigFloat():
 		number.sign = '-'
 		number2 = bigfloat.BigFloat()
 		number2.integer = '54'
-		number2.comma = True
+		number2.comma = '.'
 		number2.fraction = '27'
 		number2.sign = '-'
 		assert number == number2

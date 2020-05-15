@@ -56,7 +56,7 @@ class Registry:
 	# NEWIT переведен на объект числа
 	@property
 	def comma(self):
-		return int(self._value.comma)
+		return self._value.comma
 
 	# NEWIT Длины частей (используются в АЛУ). Переведены на объект числа
 	@property
@@ -92,11 +92,14 @@ class Registry:
 		# NEWIT если новый ввод, создаем новый объект числа
 		if flags.IS_NEW_INPUT:
 			self._value = bf.BigFloat()
-		# Ошибка при вводе второй точки
-		if c == '.' and self._value.comma:
-			raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
+		# if c == '.' and self._value.comma:
+		# 	raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
 		if c == '.':
-			self._value.comma = True
+			# Ошибка при вводе второй точки
+			if self._value.comma:
+				raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
+			else:
+				self._value.comma = c
 		elif self._value.comma:
 			self._value.fraction += c
 		# в том числе отсекает ввод незанчащих 0 целой части
@@ -149,12 +152,15 @@ class RegistryZ(Registry):
 	# def input(self, c: str, flags: object, A, B, op):
 	# def input(self, c: str, flags: object):
 		for c in merger:
-			if c == '.' and self._value.comma:
-				raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
+			# if c == '.' and self._value.comma:
+			# 	raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
 			if c == '-' or c == '':
 				self._value.sign = c
 			elif c == '.':
-				self._value.comma = True
+				if self._value.comma:
+					raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
+				else:
+					self._value.comma = c
 			elif self._value.comma:
 				self._value.integer = c + self._value.integer
 			# в том числе отсекает ввод незанчащих 0 целой части
