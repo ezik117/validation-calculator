@@ -280,3 +280,8 @@ class BigFloat:
 		# if self.sign != other.sign:
 		# 	return self.__operation(other, '+')
 		return self.__operation(other, '-')
+
+	def __abs__(self):
+		transition = self
+		transition.sign = ''
+		return transition

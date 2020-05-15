@@ -9,4 +9,5 @@ if %1 == float pytest -v test_calc_float.py
 if %1 == num pytest -v test_bigfloat.py
 if %1 == reg pytest -v test_registers.py
 if %1 == cmp pytest -v test_compare_bigfloat.py
+if %1 == abs pytest -v test_abs_bigfloat.py
 if %1 == help help.bat
