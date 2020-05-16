@@ -1,4 +1,4 @@
 from calculator import Calculator
 
-calc = Calculator(0)
+calc = Calculator(2)
 calc.processKeys()

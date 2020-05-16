@@ -55,7 +55,7 @@ class Calculator:
 			print(f"A='{self.A}'  ({self.OP})  B='{self.B}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}", end="\r")
 		elif self.mode == 2:
 			print("\r" + " "*80, end="")
-			print("\r" + self.A, end='')
+			print("\r" + str(self.A), end='')
 		# изменился вид вывода (для возможности добавления новых значений)
 		elif self.mode == 3:
 			return (f"A='{self.A}'  ({self.OP})  B='{self.B}'"

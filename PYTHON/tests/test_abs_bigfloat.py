@@ -46,3 +46,28 @@ class TestBigFloat():
 	def test_abs_positive(self):
 		number = self.test_input_negative()
 		assert '54.27' == str(abs(number))
+
+	# тест сравнения модулей числа
+	def test_abs_with_abs(self):
+		number = self.test_input_positive()
+		number2 = self.test_input_negative()
+		assert number != number2
+		assert abs(number) == abs(number2)
+
+	# тест сравнения abs  с нулем
+	def test_abs_with_zero(self):
+		number = self.test_input_positive()
+		number0 = bigfloat.BigFloat()
+		assert number > number0
+		assert number >= number0
+		assert abs(number) > abs(number0)
+		assert abs(number) >= abs(number0)
+
+	# тест сравнения abs  с нулем
+	def test_abs_with_zero(self):
+		number = self.test_input_negative()
+		number0 = bigfloat.BigFloat()
+		assert number < number0
+		assert number <= number0
+		assert abs(number) > abs(number0)
+		assert abs(number) >= abs(number0)

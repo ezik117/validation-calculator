@@ -231,22 +231,29 @@ class BigFloat:
 	# генератор сложения (генерирует сбор строки числа)
 	# IN: A - объект первого числа
 	# IN: B - объект второго числа
-	def __operation(self, other, op):
+	# IN: op - обрабатываемая математическая операция
+	# leftside - как обрабатывается операция (меняются ли местами операнды)
+	def __operation(self, other, op, leftside: bool = True):
 		# Вначале нужно найти максимально длинную часть
 		max_len = self.__max_len(other)
-		if op == '-' and self < other:
-			first = other.extract(*max_len)
-			second = self.extract(*max_len)
-		else:
-			# TODO если в '+' число отрицательное, то результат отрицательный
-			# sign = self.sign
+		# if op == '-' and self < other:
+		# TODO рефакторить после тестов
+		if leftside:
+			sign = ''
 			first = self.extract(*max_len)
 			second = other.extract(*max_len)
+			# if op == '+' and self.sign: sign = '-'
+			if self.sign: sign = '-'
+		else:
+			# TODO если в '+' число отрицательное, то результат отрицательный
+			sign = '-'
+			first = other.extract(*max_len)
+			second = self.extract(*max_len)
 		carry = 0
 		# NEWIT зависиомсть формулы расчета от типа операции
 		pref = 1 if op == '+' else -1
 		# NEWIT имитация знака числа для настройки генератора
-		sign = ''
+		# sign = ''
 		# Генератор результата суммы
 		for x, y in zip(first, second):
 			# Если попалась точка дробной части
@@ -270,18 +277,24 @@ class BigFloat:
 
 	def __add__(self, other):
 		# NEWIT выбор в зависимости от знака числа
-		# if self.sign != other.sign:
+		if self.sign != other.sign:
 			# если знаки разные, то это вычитание
-			# return self.__operation(other, '-')
+			return self.__operation(other, '-', abs(self) >= abs(other))
 		# иначе - сложение, знак определяем в __operation
 		return self.__operation(other, '+')
 
 	def __sub__(self, other):
 		# if self.sign != other.sign:
 		# 	return self.__operation(other, '+')
-		return self.__operation(other, '-')
+		return self.__operation(other, '-', abs(self) >= abs(other))
 
 	def __abs__(self):
 		transition = self
 		transition.sign = ''
 		return transition
+
+
+# if __name__ == '__main__':
+# 	num0 = BigFloat()
+# 	print(str(num0))
+# 	print(str(abs(num0)))
