@@ -59,7 +59,7 @@ class TestFlags():
 	def test_press_equal(self):
 		calc = self.test_input_first_op()
 		calc.pressedEqual()
-		assert "A='12.1'  (+)  B='-42.3'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='-42.3'  (+)  B='12.1'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		return calc
 
 	# проверка ввода операции после ввода первого числа

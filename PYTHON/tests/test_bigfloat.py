@@ -28,7 +28,7 @@ class TestBigFloat():
 		assert '5' == str(number)
 		number.integer = '54'
 		assert '54' == str(number)
-		number.comma = True
+		number.comma = '.'
 		assert '54.0' == str(number)
 		number.fraction = '2'
 		assert '54.2' == str(number)
@@ -84,17 +84,17 @@ class TestBigFloat():
 		number = self.test_call()
 		number2 = bigfloat.BigFloat()
 		number2.integer = '100'
-		number2.comma = True
+		number2.comma = '.'
 		number2.fraction = '1'
 		assert not (number == number2)
 		number3 = bigfloat.BigFloat()
 		number3.integer = '100'
-		number3.comma = True
+		number3.comma = '.'
 		number3.fraction = '1'
 		assert number2 == number3
 		number2 = bigfloat.BigFloat()
 		number2.integer = '100'
-		number2.comma = True
+		number2.comma = '.'
 		number2.fraction = '1'
 		number2.BS()
 		number2.BS()
@@ -104,25 +104,27 @@ class TestBigFloat():
 		assert number2 == number3
 	
 	# проверка специального метода __lt__
+	# @pytest.mark.skip()
 	def test_lower_than_method(self):
 		number = self.test_call()
 		number2 = bigfloat.BigFloat()
 		number2.integer = '100'
-		number2.comma = True
+		number2.comma = '.'
 		number2.fraction = '1'
 		assert number < number2
 
 	# проверка специального метода __le__
+	# @pytest.mark.skip()
 	def test_lower_than__equal_method(self):
 		number = self.test_call()
 		number2 = bigfloat.BigFloat()
 		number2.integer = '100'
-		number2.comma = True
+		number2.comma = '.'
 		number2.fraction = '1'
 		assert number <= number2
 		number3 = bigfloat.BigFloat()
 		number3.integer = '100'
-		number3.comma = True
+		number3.comma = '.'
 		number3.fraction = '1'
 		# num2 и num3 равны
 		assert number2 <= number3
