@@ -71,12 +71,12 @@ class Flags:
 		return self.__CD
 
 	# Разрешить новый ввод
-	@property
+	# @property
 	def NEW_REG_FILLING(self):
 		self.__CD = True
 
 	# Заполнить текущий регистр А
-	@property
+	# @property
 	def ENABLE_REG_FILLING(self):
 		self.__CD = False
 
@@ -93,12 +93,12 @@ class Flags:
 		return not self.__CONST
 
 	# Начать новый цикл ввода операций
-	@property
+	# @property
 	def ENABLE_OPS_CONTINUES(self):
 		self.__CONST = True
 
 	# Закончить текущий цикл ввода операций
-	@property
+	# @property
 	def DISABLE_OPS_CONTINUES(self):
 		self.__CONST = False
 
@@ -110,12 +110,12 @@ class Flags:
 		return self.__EQ
 
 	# Запомнить событие нажатия клавиши "равно"
-	@property
+	# @property
 	def EQUAL_PRESSED(self):
 		self.__EQ = True
 
 	# Запомнить, что клавиша "равно" еще не нажата
-	@property
+	# @property
 	def EQUAL_NOT_PRESSED(self):
 		self.__EQ = False
 
@@ -148,9 +148,9 @@ class Flags:
 # -------------------------------------------------------------------- #
 
 	def clear(self):
-		self.NEW_REG_FILLING
-		self.DISABLE_OPS_CONTINUES
-		self.EQUAL_NOT_PRESSED
+		self.NEW_REG_FILLING()
+		self.DISABLE_OPS_CONTINUES()
+		self.EQUAL_NOT_PRESSED()
 
 
 # -------------------------- Тестовые методы ------------------------- #

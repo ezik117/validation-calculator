@@ -64,20 +64,20 @@ class Calculator:
 	# нажата цифровая клавиша. Ввод значения в регистр A
 	# IN: с - символ нажатой клавиши
 	def pressedDigitalKey(self, c: str):
-		self.flags.EQUAL_NOT_PRESSED
+		self.flags.EQUAL_NOT_PRESSED()
 		if c == '\x08':
 			self.A.BS()
 		else:	
 			self.A.input(c, self.flags)
 			# NEWIT флаг заполнения регистра устанавливается, если 0 не является первым
 			if self.flags.IS_NEW_INPUT and c != '0':
-				self.flags.ENABLE_REG_FILLING
+				self.flags.ENABLE_REG_FILLING()
 
 	# нажата арифметическая клавиша - обработаем
 	# IN: с - символ нажатой клавиши
 	def pressedOpcode(self, c: str):
 		# NEWIT ввод отрицательного числа в калькуляторе организован как операция 0 - number
-		self.flags.EQUAL_NOT_PRESSED
+		self.flags.EQUAL_NOT_PRESSED()
 		# NEWIT опять вводим метод для обрезки незначащих 0 дробной части
 		# альтернатива - паттерн наблюдатель, но он громоздок для этого случая
 		self.A.truncate()
@@ -85,19 +85,19 @@ class Calculator:
 			self.__ALU.process(self.B, self.A, self.OP)
 		self.B.copyFrom(self.A)
 		self.OP = c
-		self.flags.NEW_REG_FILLING
-		self.flags.ENABLE_OPS_CONTINUES
+		self.flags.NEW_REG_FILLING()
+		self.flags.ENABLE_OPS_CONTINUES()
 
 	# нажата клавиша "равно" - обработаем
 	def pressedEqual(self):
-		self.flags.EQUAL_PRESSED
+		self.flags.EQUAL_PRESSED()
 		self.A.truncate()
 		if self.flags.IS_OPS_CONTINUES:
 			self.__ALU.process(self.B, self.A, self.OP)
 		else:
 			self.__ALU.process(self.A, self.B, self.OP)
-		self.flags.NEW_REG_FILLING
-		self.flags.DISABLE_OPS_CONTINUES
+		self.flags.NEW_REG_FILLING()
+		self.flags.DISABLE_OPS_CONTINUES()
 
 	# цикл обработки нажатия клавиш с клавиатуры
 	def processKeys(self):
