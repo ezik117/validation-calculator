@@ -162,12 +162,19 @@ class RegistryZ(Registry):
 					raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
 				else:
 					self._value.comma = c
-			elif self._value.comma:
+					# NEWIT но, если приходит запятая, то значит собирали дробную часть,
+					# меняем местами и начинаем собирать настоящую целую часть
+					# TODO можно обрезать незначащие нули справа в дробной части
+					self._value.fraction = self._value.integer
+					self._value.integer = ''
+			# elif self._value.comma:
+			# NEWIT вначале собираем все в целое число
+			else:
 				self._value.integer = c + self._value.integer
 			# в том числе отсекает ввод незанчащих 0 целой части
 			# TODO ??? заменить self.__integer на len == 0
-			elif self._value.fraction or c != 0:
-				self._value.fraction = c + self._value.fraction
+			# elif self._value.fraction or c != 0:
+			# 	self._value.fraction = c + self._value.fraction
 
 		# print(f"A='{A}'  ({op})  B='{B}'  Z='{self}'"
 		# 		f"  CommaZ={self._value.comma}  CommaA={A.value.comma}"
