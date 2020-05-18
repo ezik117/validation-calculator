@@ -42,7 +42,7 @@ class ALU:
 		if op == '+':
 			self.__Z.value = A.value + B.value
 		elif op == '-':
-			self.__Z.value = A.value - B.value
+			self.__Z.value = B.value - A.value
 		elif op == '/':
 			self.__Z.value = str(float(A.value) / float(B.value))
 		elif op == '*':
@@ -54,8 +54,8 @@ class ALU:
 		self.__Z.truncate()
 		# NEWIT если имя внутри метода не соотвествует имени регистра, то нужно менять
 		# изначально АЛУ был методом кальулятора, поэтому использовал объекты self
-		if A.name != 'A':
-			A, B = B, A
+		# if A.name != 'A':
+		# 	A, B = B, A
 		# выбор алгоритма вывода результатов
 		# если нажата "равно" и операция не завершена
 		# FIXME после равно и нажатии действия операция проводиться с предыдущим значением

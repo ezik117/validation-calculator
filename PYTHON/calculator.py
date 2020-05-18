@@ -82,7 +82,7 @@ class Calculator:
 		# альтернатива - паттерн наблюдатель, но он громоздок для этого случая
 		self.A.truncate()
 		if self.flags.IS_OPERATON_POSSIBLE:
-			self.__ALU.process(self.B, self.A, self.OP)
+			self.__ALU.process(self.A, self.B, self.OP)
 		self.B.copyFrom(self.A)
 		self.OP = c
 		self.flags.new_reg_filling()
@@ -93,7 +93,7 @@ class Calculator:
 		self.flags.equal_pressed()
 		self.A.truncate()
 		if self.flags.IS_OPS_CONTINUES:
-			self.__ALU.process(self.B, self.A, self.OP)
+			self.__ALU.process(self.A, self.B, self.OP)
 		else:
 			self.__ALU.process(self.A, self.B, self.OP)
 		self.flags.new_reg_filling()
