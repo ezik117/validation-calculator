@@ -143,6 +143,11 @@ class Flags:
 	def IS_NEXT_OPERATION(self):
 		return not self.IS_EQUAL_PRESSED and self.IS_OPS_CONTINUES
 
+	# NEWIT свойство для рефакторинга алгоритма АЛУ
+	@property
+	def IS_UNKNOWN_OPERATION(self):
+		return not self.IS_EQUAL_PRESSED and not self.IS_OPS_CONTINUES
+
 # -------------------------------------------------------------------- #
 #                                Методы                                #
 # -------------------------------------------------------------------- #

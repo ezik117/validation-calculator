@@ -64,18 +64,26 @@ class ALU:
 			B.copyFrom(A)
 			# копируем из Z в А
 			A.copyFrom(self.__Z)
-		# если нажата "равно" и операция завершена
-		elif self.__flags.IS_A_op_B:
-			# копируем из Z в А
-			A.copyFrom(self.__Z)
-		# если НЕ "равно" и операция не завершена
-		elif self.__flags.IS_NEXT_OPERATION:
-			# копируем из Z в А
-			A.copyFrom(self.__Z)
-			# копируем из А в В
-			B.copyFrom(A)
-		# в любом другом случае (нажато НЕ "равно" и операция завершилась)
-		else:
+		# проверка ошибочного случая ( НЕ нажато "равно" и операция завершилась)
+		elif self.__flags.IS_UNKNOWN_OPERATION:
 			raise Exception("ALU: unknown flags combination")
+		# все остальные случаи одинаковы
+		else:
+			A.copyFrom(self.__Z)
+		# если нажата "равно" и операция завершена
+		# elif self.__flags.IS_A_op_B:
+			# копируем из Z в А
+			# A.copyFrom(self.__Z)
+		# если НЕ "равно" и операция не завершена
+		# elif self.__flags.IS_NEXT_OPERATION:
+			# копируем из Z в А
+			# A.copyFrom(self.__Z)
+			# копируем из А в В
+			# NEWIT !!! удаление (рефакторинг) базовых особенностей калькулятора
+			# не требуется, т.к. повторяется в калькуляторе всегда (pressedOpcode)
+			# B.copyFrom(A)
+		# в любом другом случае (нажато НЕ "равно" и операция завершилась)
+		# else:
+		# 	raise Exception("ALU: unknown flags combination")
 
 # ---------------------------- Мои методы ---------------------------- #

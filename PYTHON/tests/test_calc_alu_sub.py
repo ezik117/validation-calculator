@@ -101,9 +101,8 @@ class TestFlags():
 		assert "A='30.2'  (-)  B='12.1'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		calc.pressedEqual()
 		assert "A='18.1'  (-)  B='12.1'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
-		# WARNING Удалить незначащий ноль в целых числах
-		# calc.pressedEqual()
-		# assert "A='6.0'  (-)  B='12.1'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		calc.pressedEqual()
+		assert "A='6.0'  (-)  B='12.1'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		return calc
 
 	# тест нажатия клавиши ESC "очистка"

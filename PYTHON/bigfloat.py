@@ -112,6 +112,7 @@ class BigFloat:
 	# Обрезка незначащих нулей дробной части
 	def truncate(self):
 		self.fraction = self.fraction.rstrip('0')
+		self.integer = self.integer.lstrip('0')
 
 	# Вычисление максимальных длин целой и дробной частей
 	# OUT: [0] - максимальная длина целой части
@@ -131,6 +132,15 @@ class BigFloat:
 		X.integer, *X.fraction = str(other).split('.')
 		X.integer = X.integer.lstrip('0')
 		X.fraction = X.fraction[0].rstrip('0') if X.fraction else ''
+		return X
+
+	# Копирование объекта числа для метода abs (и возможно других)
+	def __copy(self):
+		X = BigFloat()
+		X.integer = self.integer
+		X.fraction = self.fraction
+		X.comma = self.comma
+		X.sign = self.sign
 		return X
 
 # ------------------------ Специальные методы ------------------------ #
@@ -289,7 +299,8 @@ class BigFloat:
 		return self.__operation(other, '-', abs(self) >= abs(other))
 
 	def __abs__(self):
-		transition = self
+		# FIXME т.к. это ссылка, то abs меняет знак числа
+		transition = self.__copy()
 		transition.sign = ''
 		return transition
 

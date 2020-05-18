@@ -70,6 +70,10 @@ class Registry:
 	@property
 	def name(self):
 		return self.__name
+
+	@property
+	def sign(self):
+		return self._value.sign
 # --------------------------- Методы класса -------------------------- #
 
 	# сброс содержимого регистра
