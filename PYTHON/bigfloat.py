@@ -256,6 +256,7 @@ class BigFloat:
 			if self.sign: sign = '-'
 		else:
 			# TODO если в '+' число отрицательное, то результат отрицательный
+			# FIXME B + (-A), если abs(A) < abs(B)
 			sign = '-'
 			first = other.extract(*max_len)
 			second = self.extract(*max_len)
@@ -294,12 +295,11 @@ class BigFloat:
 		return self.__operation(other, '+')
 
 	def __sub__(self, other):
-		# if self.sign != other.sign:
-		# 	return self.__operation(other, '+')
+		if self.sign != other.sign:
+			return self.__operation(other, '+')
 		return self.__operation(other, '-', abs(self) >= abs(other))
 
 	def __abs__(self):
-		# FIXME т.к. это ссылка, то abs меняет знак числа
 		transition = self.__copy()
 		transition.sign = ''
 		return transition
