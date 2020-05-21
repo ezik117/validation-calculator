@@ -18,6 +18,9 @@ class ALU:
 
 	def __init__(self, flags: object):
 		self.__flags = flags
+		# NEWIT core ref добавляем в АЛУ регистры А и В
+		self.__A = Registry('A')
+		self.__B = Registry('B')
 		# Регистр Z определяется через свой конструктор
 		self.__Z = RegistryZ()  # виртуальный регистр АЛУ
 
@@ -26,29 +29,54 @@ class ALU:
 	def Z(self):
 		return self.__Z
 
+	# NEWIT core ref свойства регистров
+	@property
+	def B(self):
+		return self.__B
+	
+	@property
+	def A(self):
+		return self.__A
+
 	# очистка АЛУ
 	def clear(self):
+		# NEWIT core ref очистка регистров
+		self.__A.clear()
+		self.__B.clear()
 		self.__Z.clear()
+
+	# NEWIT core ref делегирование методом input и BS
+	def input(self, c):
+		# FIXME flag CD
+		self.__A.input(c, self.__flags)
+
+	def BS(self):
+		self.__A.BS()
+
+	def truncate(self):
+		self.__A.truncate()
 
 	# IN: A - ссылка на регистр A
 	# IN: B - ссылка на регистр B
 	# IN: op - обрабатываемая операция
-	def process(self, A: Registry, B: Registry, op: str):
+	# NEWIT core ref обработка теперь в отдельном методе
+	def __operate(self, A: Registry, B: Registry, op: str):
 		# очистка регистра перед вычислением (лучше бы после, чтобы не хранить значение)
 		# NEWIT замена на очистку АЛУ, которая включает очистку регистра Z
-		self.clear()
+		self.__Z.clear()
 		# print(A.value)
 		# print(A.value < 55)
 		if op == '+':
-			self.__Z.value = A.value + B.value
+			self.__Z.value = B.value + A.value
 		elif op == '-':
 			self.__Z.value = B.value - A.value
 		elif op == '/':
-			self.__Z.value = str(float(A.value) / float(B.value))
+			self.__Z.value = str(float(B.value) / float(A.value))
 		elif op == '*':
-			self.__Z.value = str(float(A.value) * float(B.value))
-		else:
-			return  # нет операции
+			self.__Z.value = str(float(B.value) * float(A.value))
+		# else:
+		# 	return  # нет операции
+
 		# TODO возможно, нужно будет очищать незначащие 0 целой части
 		# NEWIT удаление незначащих нулей дробной части
 		self.__Z.truncate()
@@ -59,31 +87,24 @@ class ALU:
 		# выбор алгоритма вывода результатов
 		# если нажата "равно" и операция не завершена
 		# FIXME после равно и нажатии действия операция проводиться с предыдущим значением
-		if self.__flags.IS_B_op_A:
-			# копируем из А в В
-			B.copyFrom(A)
-			# копируем из Z в А
-			A.copyFrom(self.__Z)
-		# проверка ошибочного случая ( НЕ нажато "равно" и операция завершилась)
-		elif self.__flags.IS_UNKNOWN_OPERATION:
-			raise Exception("ALU: unknown flags combination")
-		# все остальные случаи одинаковы
+	# NEWIT core ref алгоритм работы АЛУ
+	def process(self, op: str):
+		# Когда нажата "равно" флаг CD не имеет значения
+		if self.__flags.IS_EQUAL_PRESSED:
+			if self.__flags.IS_OPS_CONTINUES:
+				self.__operate(self.__A, self.__B, op)
+				self.__B.copyFrom(self.__A)
+				self.__A.copyFrom(self.__Z)
+			# если нажата "равно" и операция завершена
+			else:
+				self.__operate(self.__B, self.__A, op)
+				self.__A.copyFrom(self.__Z)
+		# если НЕ нажато "равно" нужно отследить оба флага - CD и CONST
 		else:
-			A.copyFrom(self.__Z)
-		# если нажата "равно" и операция завершена
-		# elif self.__flags.IS_A_op_B:
-			# копируем из Z в А
-			# A.copyFrom(self.__Z)
-		# если НЕ "равно" и операция не завершена
-		# elif self.__flags.IS_NEXT_OPERATION:
-			# копируем из Z в А
-			# A.copyFrom(self.__Z)
-			# копируем из А в В
-			# NEWIT !!! удаление (рефакторинг) базовых особенностей калькулятора
-			# не требуется, т.к. повторяется в калькуляторе всегда (pressedOpcode)
-			# B.copyFrom(A)
-		# в любом другом случае (нажато НЕ "равно" и операция завершилась)
-		# else:
-		# 	raise Exception("ALU: unknown flags combination")
-
-# ---------------------------- Мои методы ---------------------------- #
+			if self.__flags.IS_OPERATON_POSSIBLE:
+				self.__operate(self.__A, self.__B, op)
+				self.__A.copyFrom(self.__Z)
+			self.__B.copyFrom(self.__A)
+		# NEWIT нет никаких других операций, все охватывает данный выбор
+		# ??? очистить регистр Z, чтобы не забивать память
+		# self.clear()

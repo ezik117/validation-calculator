@@ -6,16 +6,10 @@
 # *****************************************************************************
 
 import msvcrt
-from registers import Registry
+# NEWIT core ref имопртируем только АЛУ (в котором уже есть регистры)
+# from registers import Registry
 import flags
 import ALU
-
-# FIXME ТЗ устарело
-# TODO реконструкция калькулятора
-# Реализация:
-# - [x] добавить возможность ввода точки для дробных величин
-# TODO перемещение флага в регистры
-# - [-] ??? нужен ли флаг введенной точки (вынесен в класс Registry)
 
 class Calculator:
 	""" ОСНОВНОЙ КЛАСС КАЛЬКУЛЯТОРА """
@@ -26,8 +20,9 @@ class Calculator:
 	#            2 - рабочий, отображает только дисплей калькулятора
 	#            3 - тестовый, отображение регистров и флагов, как в 0. Осуществляется возврат значения для pytest
 	def __init__(self, mode: int=0):
-		self.A = Registry('A') # регистр A
-		self.B = Registry('B') # регистр B
+		# NEWIT core ref регистры переносим в АЛУ
+		# self.A = Registry('A') # регистр A
+		# self.B = Registry('B') # регистр B
 		# регистр Z теперь полностью принадлежит АЛУ, в калькуляторе его нет
 		self.OP = None        # текущее арифметическое действие
 		self.flags = flags.Flags()  # флаги калькулятора
@@ -39,36 +34,39 @@ class Calculator:
 
 	# общий сброс
 	def clear(self):
-		self.A.clear()
-		self.B.clear()
+		# NEWIT core ref очистка регистров происходит в АЛУ
+		# self.A.clear()
+		# self.B.clear()
 		# очищаем АЛУ (фактически только регистр Z на данном этапе)
 		self.__ALU.clear()
 		self.OP = None
 		self.flags.clear()
 
 	# отобразить содержимое регистров в соответствии с выбранным режимом mode
+	# NEWIT core ref изменение вывода регистров А и В
 	def displayRegisters(self):
 		if self.mode == 0:
-			print(f"A='{self.A}'  ({self.OP})  B='{self.B}'  Z='{self.__ALU.Z}'  SignZ='{self.__ALU.Z.sign}'  SignA='{self.A.sign}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}")
+			print(f"A='{self.__ALU.A}'  ({self.OP})  B='{self.__ALU.B}'  Z='{self.__ALU.Z}'  SignZ='{self.__ALU.Z.sign}'  SignA='{self.__ALU.A.sign}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}")
 		elif self.mode == 1:
 			print("\r" + " "*50, end='\r')
-			print(f"A='{self.A}'  ({self.OP})  B='{self.B}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}", end="\r")
+			print(f"A='{self.__ALU.A}'  ({self.OP})  B='{self.__ALU.B}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}", end="\r")
 		elif self.mode == 2:
 			print("\r" + " "*80, end="")
-			print("\r" + str(self.A), end='')
+			print("\r" + str(self.__ALU.A), end='')
 		# изменился вид вывода (для возможности добавления новых значений)
 		elif self.mode == 3:
-			return (f"A='{self.A}'  ({self.OP})  B='{self.B}'"
+			return (f"A='{self.__ALU.A}'  ({self.OP})  B='{self.__ALU.B}'"
 				f"  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}")
 
 	# нажата цифровая клавиша. Ввод значения в регистр A
 	# IN: с - символ нажатой клавиши
+	# NEWIT core ref input и BS теперь в АЛУ
 	def pressedDigitalKey(self, c: str):
 		self.flags.equal_not_pressed()
 		if c == '\x08':
-			self.A.BS()
+			self.__ALU.BS()
 		else:	
-			self.A.input(c, self.flags)
+			self.__ALU.input(c)
 			# NEWIT флаг заполнения регистра устанавливается, если 0 не является первым
 			if self.flags.IS_NEW_INPUT and c != '0':
 				self.flags.enable_reg_filling()
@@ -79,11 +77,12 @@ class Calculator:
 		# NEWIT ввод отрицательного числа в калькуляторе организован как операция 0 - number
 		self.flags.equal_not_pressed()
 		# NEWIT опять вводим метод для обрезки незначащих 0 дробной части
-		# альтернатива - паттерн наблюдатель, но он громоздок для этого случая
-		self.A.truncate()
-		if self.flags.IS_OPERATON_POSSIBLE:
-			self.__ALU.process(self.A, self.B, self.OP)
-		self.B.copyFrom(self.A)
+		self.__ALU.truncate()
+		# NEWIT core ref алгоритм выбора теперь полностью в АЛУ
+		self.__ALU.process(self.OP)
+		# if self.flags.IS_OPERATON_POSSIBLE:
+		# 	self.__ALU.process(self.A, self.B, self.OP)
+		# self.B.copyFrom(self.A)
 		self.OP = c
 		self.flags.new_reg_filling()
 		self.flags.enable_ops_continues()
@@ -91,11 +90,13 @@ class Calculator:
 	# нажата клавиша "равно" - обработаем
 	def pressedEqual(self):
 		self.flags.equal_pressed()
-		self.A.truncate()
-		if self.flags.IS_OPS_CONTINUES:
-			self.__ALU.process(self.A, self.B, self.OP)
-		else:
-			self.__ALU.process(self.A, self.B, self.OP)
+		self.__ALU.truncate()
+		# NEWIT core ref алгоритм выбора теперь полностью в АЛУ
+		self.__ALU.process(self.OP)
+		# if self.flags.IS_OPS_CONTINUES:
+		# 	self.__ALU.process(self.A, self.B, self.OP)
+		# else:
+		# 	self.__ALU.process(self.A, self.B, self.OP)
 		self.flags.new_reg_filling()
 		self.flags.disable_ops_continues()
 
