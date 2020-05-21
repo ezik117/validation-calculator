@@ -21,7 +21,7 @@ class TestFlags():
 		assert "A='0'  (None)  B='0'  EQ=0  CD=1  CONST=0" == calc.displayRegisters()
 		return calc
 
-	# ввод цифр
+	# ввод отрицательного числа
 	def test_input_negative_number(self):
 		calc = self.test_initial()
 		calc.pressedOpcode('-')
@@ -38,8 +38,8 @@ class TestFlags():
 		assert "A='-54.4'  (+)  B='-54.4'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
 		return calc
 
-	# проверка ввода операции после ввода первого числа
-	# ввод второго числа
+	# сложение первого отрицательного числа и второго положительного
+	# ввод второго положительного числа
 	# @pytest.mark.skip()
 	def test_input_first_op(self):
 		calc = self.test_input_negative_number()
@@ -54,7 +54,7 @@ class TestFlags():
 		assert "A='12.1'  (+)  B='-54.4'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
 		return calc
 
-	# нажатие равно
+	# нажатие равно (сложение положительного и отрицательного чисел)
 	# @pytest.mark.skip()
 	def test_press_equal(self):
 		calc = self.test_input_first_op()
@@ -62,7 +62,7 @@ class TestFlags():
 		assert "A='-42.3'  (+)  B='12.1'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		return calc
 
-	# проверка ввода операции после ввода первого числа
+	# сложение получившегося отрицательного числа с новым положительным числом
 	# ввод второго числа, затем продолжающийся ввод операций (и "равно" в конце)
 	# @pytest.mark.skip()
 	def test_continuos_ops(self):
@@ -81,7 +81,7 @@ class TestFlags():
 		calc.pressedEqual()
 		assert ("A='-30.3'  (+)  B='2'  EQ=1  CD=1  CONST=0") == calc.displayRegisters()
 
-	# последовательный ввод "равно" после ввода 2 чисел и одной операции
+	# последовательный ввод "равно" (прибавка полижительного к отрицательному)
 	# @pytest.mark.skip()
 	def test_continuos_equal(self):
 		calc = self.test_press_equal()
@@ -91,6 +91,8 @@ class TestFlags():
 		assert "A='-18.1'  (+)  B='12.1'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		calc.pressedEqual()
 		assert "A='-6.0'  (+)  B='12.1'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		calc.pressedEqual()
+		assert "A='6.1'  (+)  B='12.1'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		return calc
 
 	# тест нажатия клавиши ESC "очистка"
