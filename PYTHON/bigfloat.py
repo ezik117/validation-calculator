@@ -274,7 +274,7 @@ class BigFloat:
 		max_len = A.__max_len(B)
 		if abs(A) < abs(B):
 			A, B = B, A
-		sign = '' if abs(A) == abs(B) else str(A.sign + B.sign)
+		sign = str(A.sign) if abs(A) == abs(B) else str(A.sign + B.sign)
 		carry = 0
 		# зависиомсть формулы расчета от типа операции
 		# NEWIT теперь зависимость только от знака числа

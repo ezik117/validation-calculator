@@ -27,7 +27,6 @@ class TestFlags():
 		calc.pressedOpcode('-')
 		assert "A='0'  (-)  B='0'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
 		calc.pressedDigitalKey('5')
-		# assert "A='5'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
 		calc.pressedDigitalKey('4')
 		assert "A='54'  (-)  B='0'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
 		calc.pressedDigitalKey('.')
@@ -43,14 +42,11 @@ class TestFlags():
 	# @pytest.mark.skip()
 	def test_input_first_op(self):
 		calc = self.test_input_negative_number()
-		# calc.pressedOpcode('+')
-		# assert "A='0'  (+)  B='-54.4'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
 		calc.pressedDigitalKey('1')
 		calc.pressedDigitalKey('2')
 		assert "A='12'  (+)  B='-54.4'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
 		calc.pressedDigitalKey('.')
 		calc.pressedDigitalKey('1')
-		# calc.pressedDigitalKey('2')
 		assert "A='12.1'  (+)  B='-54.4'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
 		return calc
 
@@ -104,16 +100,14 @@ class TestFlags():
 		# WARNING нет проверки очистки запятой
 		return calc
 
-	# ввод цифр
+	# операция вида (-B) - (-A)
 	def test_input_negative_second_number(self):
 		calc = self.test_initial()
 		calc.pressedOpcode('-')
 		assert "A='0'  (-)  B='0'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
 		calc.pressedDigitalKey('5')
 		calc.pressedDigitalKey('4')
-		assert "A='54'  (-)  B='0'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
 		calc.pressedDigitalKey('.')
-		assert "A='54.0'  (-)  B='0'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
 		calc.pressedDigitalKey('4')
 		assert "A='54.4'  (-)  B='0'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
 		calc.pressedOpcode('-')

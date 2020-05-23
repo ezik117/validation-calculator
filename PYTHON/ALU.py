@@ -80,7 +80,6 @@ class ALU:
 		# если нажата "равно" и операция не завершена
 	# NEWIT core ref алгоритм работы АЛУ
 	def process(self, op: str):
-		print(op)
 		# Когда нажата "равно" флаг CD не имеет значения
 		if self.__flags.IS_EQUAL_PRESSED:
 			if self.__flags.IS_OPS_CONTINUES:
