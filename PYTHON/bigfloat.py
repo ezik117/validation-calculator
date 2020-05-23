@@ -5,6 +5,38 @@
 # ОПИСАНИЕ:  Описывает класс больших чисел, используемых в регистрах
 # *****************************************************************************
 
+class Sign():
+
+	def __init__(self, sign: bool=False):
+		self.__sign = sign
+
+	@property
+	def _sign(self):
+		return self.__sign
+
+	def __str__(self):
+		return '-' if self._sign else ''
+
+	def __add__(self, other):
+		return Sign(self._sign & other._sign if self._sign == other._sign else not other._sign)
+
+	def __eq__(self, other):
+		return self._sign == other._sign
+
+	def __invert__(self):
+		return Sign(not self._sign)
+
+	# TODO рефакторить ???
+	@_sign.setter
+	def _sign(self, val):
+		if val == '-':
+			self.__sign = True
+		elif val == '+' or val == '':
+			self.__sign = False
+		else:
+			raise ValueError('unknown sign symbol')
+
+
 class BigFloat:
 
 	# NEWIT Атрибуты класса
@@ -20,7 +52,7 @@ class BigFloat:
 		self.__comma = ''
 		# NEWIT знак числа: "-" - отрицательное число, интерпретируется как True
 		# "" - положительное число, интерпретируется как False (пустая строка)
-		self.__sign = ''
+		self.__sign = Sign()
 
 # ----------------------------- Свойства ----------------------------- #
 
@@ -40,7 +72,15 @@ class BigFloat:
 	
 	@sign.setter
 	def sign(self, val):
+		# NEWIT как вызов __call__
 		self.__sign = val
+		# if val == '-':
+		# 	self.__sign = Sign(True)
+		# elif val == '+' or val == '':
+		# 	self.__sign = Sign()
+		# else:
+		# 	raise ValueError('unknown sign symbol')
+
 
 	# свойства частей длины
 	@property
@@ -90,7 +130,7 @@ class BigFloat:
 		num_parts = None, self.__integer, self.__fraction
 		# 0) знак числа в прямом порядке (только для методов сравнения)
 		if direct == 1:
-			yield self.sign
+			yield str(self.sign)
 		# 1) коррекция дробной части (len_frac либо равна, либо меньше max_frac)
 		for _ in range(max_diff[direct]):
 			yield 0
@@ -124,7 +164,7 @@ class BigFloat:
 	def __convert_type(self, other):
 		X = BigFloat()
 		if str(other)[0] == '-':
-			X.sign = '-'
+			X.sign = Sign(True)
 			other = str(other)[1:]
 		if str(other)[0] == '+':
 			other = str(other)[1:]
@@ -140,7 +180,7 @@ class BigFloat:
 		X.integer = self.integer
 		X.fraction = self.fraction
 		X.comma = self.comma
-		X.sign = self.sign
+		X.sign = Sign(True if str(self.sign) == '-' else False)
 		return X
 
 # ------------------------ Специальные методы ------------------------ #
@@ -232,7 +272,7 @@ class BigFloat:
 		integer = self.__integer if self.__integer else '0'
 		frac = '0' if self.comma and not self.__fraction else self.__fraction
 		# если нужен ноль с точкой, можно переделать
-		return self.sign + integer + self.comma + frac
+		return str(self.sign) + integer + self.comma + frac
 
 	# Для переопределения метода format
 	def __format__(self, format_spec):
@@ -243,65 +283,73 @@ class BigFloat:
 	# IN: B - объект второго числа
 	# IN: op - обрабатываемая математическая операция
 	# leftside - как обрабатывается операция (меняются ли местами операнды)
-	def __operation(self, other, op, leftside: bool = True):
+	# def __operation(self, other, op, leftside: bool = True):
+	def __operation(self, A, B, mark: bool=False):
 		# Вначале нужно найти максимально длинную часть
-		max_len = self.__max_len(other)
-		# if op == '-' and self < other:
-		# TODO рефакторить после тестов
-		if leftside:
+		max_len = A.__max_len(B)
+		if abs(A) < abs(B):
+			A, B = B, A
+
+		sign = str(A.sign + B.sign)
+		if abs(A) == abs(B):
 			sign = ''
-			first = self.extract(*max_len)
-			second = other.extract(*max_len)
-			# if op == '+' and self.sign: sign = '-'
-			if self.sign: sign = '-'
-		else:
+		first = A.extract(*max_len)
+		second = B.extract(*max_len)
+		# TODO рефакторить после тестов
+		# if leftside:
+		# 	sign = ''
+		# 	first = self.extract(*max_len)
+		# 	second = other.extract(*max_len)
+		# 	if self.sign: sign = '-'
+		# else:
 			# TODO если в '+' число отрицательное, то результат отрицательный
 			# FIXME B + (-A), если abs(A) < abs(B)
-			sign = '-'
-			first = other.extract(*max_len)
-			second = self.extract(*max_len)
+			# sign = '-'
+			# first = other.extract(*max_len)
+			# second = self.extract(*max_len)
 		carry = 0
-		# NEWIT зависиомсть формулы расчета от типа операции
-		pref = 1 if op == '+' else -1
+		# зависиомсть формулы расчета от типа операции
+		# pref = 1 if op == '+' else -1
+		# NEWIT теперь зависимость только от знака числа
+		pref = 1 if A.sign == B.sign else -1
 		# NEWIT имитация знака числа для настройки генератора
-		# sign = ''
 		# Генератор результата суммы
 		for x, y in zip(first, second):
 			# Если попалась точка дробной части
 			# BUG когда оба числа - целые
-			# if (x is None and self.comma) or (y is None and other.comma):
 			if x is None and y is None:
-				yield ('.' if self.comma or other.comma else '')
-				# yield '.'
+				yield ('.' if A.comma or B.comma else '')
 			else:
 				sum = str(x + pref * y + pref * carry)
 				carry = 0
 				# если результат сложения с переносом
 				if len(sum) == 2:
 					carry = 1
-					sum = sum[1] if op == '+' else str(10 + int(sum))
+					sum = sum[1] if pref == 1 else str(10 + int(sum))
+					# sum = sum[1] if op == '+' else str(10 + int(sum))
 				yield sum
-		if op == '+' and carry:
+		if pref == 1 and carry:
 			yield '1'
 		# NEWIT в конце надо отправить знак числа (для регистра Z)
 		yield sign
 
 	def __add__(self, other):
 		# NEWIT выбор в зависимости от знака числа
-		if self.sign != other.sign:
+		# if self.sign != other.sign:
 			# если знаки разные, то это вычитание
-			return self.__operation(other, '-', abs(self) >= abs(other))
+			# return self.__operation(other, '-', abs(self) >= abs(other))
 		# иначе - сложение, знак определяем в __operation
-		return self.__operation(other, '+')
+		return self.__operation(self, other)
 
 	def __sub__(self, other):
-		if self.sign != other.sign:
-			return self.__operation(other, '+')
-		return self.__operation(other, '-', abs(self) >= abs(other))
+		other.sign = ~other.sign
+		# if self.sign != other.sign:
+		# 	return self.__operation(other, '+')
+		return self.__operation(self, other, True)
 
 	def __abs__(self):
 		transition = self.__copy()
-		transition.sign = ''
+		transition.sign = Sign()
 		return transition
 
 

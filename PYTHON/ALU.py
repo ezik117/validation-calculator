@@ -89,15 +89,20 @@ class ALU:
 		# FIXME после равно и нажатии действия операция проводиться с предыдущим значением
 	# NEWIT core ref алгоритм работы АЛУ
 	def process(self, op: str):
+		print(op)
 		# Когда нажата "равно" флаг CD не имеет значения
 		if self.__flags.IS_EQUAL_PRESSED:
 			if self.__flags.IS_OPS_CONTINUES:
 				self.__operate(self.__A, self.__B, op)
+				if op == '-':
+					self.__A.value.sign = ~self.__A.value.sign
 				self.__B.copyFrom(self.__A)
 				self.__A.copyFrom(self.__Z)
 			# если нажата "равно" и операция завершена
 			else:
 				self.__operate(self.__B, self.__A, op)
+				if op == '-':
+					self.__B.value.sign = ~self.__B.value.sign
 				self.__A.copyFrom(self.__Z)
 		# если НЕ нажато "равно" нужно отследить оба флага - CD и CONST
 		else:

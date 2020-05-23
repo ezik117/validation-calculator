@@ -160,7 +160,7 @@ class RegistryZ(Registry):
 			# if c == '.' and self._value.comma:
 			# 	raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
 			if c == '-' or c == '':
-				self._value.sign = c
+				self._value.sign._sign = c
 			elif c == '.':
 				if self._value.comma:
 					raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
