@@ -72,15 +72,7 @@ class BigFloat:
 	
 	@sign.setter
 	def sign(self, val):
-		# NEWIT как вызов __call__
 		self.__sign = val
-		# if val == '-':
-		# 	self.__sign = Sign(True)
-		# elif val == '+' or val == '':
-		# 	self.__sign = Sign()
-		# else:
-		# 	raise ValueError('unknown sign symbol')
-
 
 	# свойства частей длины
 	@property
@@ -122,7 +114,7 @@ class BigFloat:
 
 	# IN: max_int - максимальная длина целой части числа из двух
 	# IN: max_frac - максимальная длина дробной части числа из двух
-	# IN: first - направление обхода числа (True - обход с начала, False - обход с конца)
+	# IN: direct - направление обхода числа (1 - обход с начала, -1 - обход с конца)
 	def extract(self, max_int: int = 0, max_frac: int = 0, direct: int = __INVERSE):
 		# NEWIT Определяем переменные для обхода (кортежи, из которых выбираются
 		# данные согласно направлению обхода direct)
@@ -155,12 +147,12 @@ class BigFloat:
 		self.integer = self.integer.lstrip('0')
 
 	# Вычисление максимальных длин целой и дробной частей
-	# OUT: [0] - максимальная длина целой части
-	# OUT: [1] - максимальная длина дробной части
+	# OUT: max_len[0] - максимальная длина целой части
+	# OUT: max_len[1] - максимальная длина дробной части
 	def __max_len(self, other):
 		return max(self.len_int, other.len_int), max(self.len_frac, other.len_frac)
 
-	# NEWIT Конвертирование типов int и float в BigFloat для сравнения
+	# NEWIT Конвертирование типов int и float в BigFloat для операций сравнения
 	def __convert_type(self, other):
 		X = BigFloat()
 		if str(other)[0] == '-':
@@ -265,10 +257,6 @@ class BigFloat:
 	# 3) если введена точка, показывает дробное число
 	# 4) если дробной части нет, но есть точка, показывает "х.0" или "0.0"
 	def __str__(self):
-		# comma = '.' if self.comma else ''
-		# NEWIT вывод знака числа
-		# sign = '-' if self.__sign else ''
-		# integer = '0' if self.comma and not self.__integer else self.__integer
 		integer = self.__integer if self.__integer else '0'
 		frac = '0' if self.comma and not self.__fraction else self.__fraction
 		# если нужен ноль с точкой, можно переделать
@@ -281,42 +269,20 @@ class BigFloat:
 	# генератор сложения (генерирует сбор строки числа)
 	# IN: A - объект первого числа
 	# IN: B - объект второго числа
-	# IN: op - обрабатываемая математическая операция
-	# leftside - как обрабатывается операция (меняются ли местами операнды)
-	# def __operation(self, other, op, leftside: bool = True):
-	def __operation(self, A, B, mark: bool=False):
+	def __operation(self, A, B):
 		# Вначале нужно найти максимально длинную часть
 		max_len = A.__max_len(B)
 		if abs(A) < abs(B):
 			A, B = B, A
-
-		sign = str(A.sign + B.sign)
-		if abs(A) == abs(B):
-			sign = ''
-		first = A.extract(*max_len)
-		second = B.extract(*max_len)
-		# TODO рефакторить после тестов
-		# if leftside:
-		# 	sign = ''
-		# 	first = self.extract(*max_len)
-		# 	second = other.extract(*max_len)
-		# 	if self.sign: sign = '-'
-		# else:
-			# TODO если в '+' число отрицательное, то результат отрицательный
-			# FIXME B + (-A), если abs(A) < abs(B)
-			# sign = '-'
-			# first = other.extract(*max_len)
-			# second = self.extract(*max_len)
+		sign = '' if abs(A) == abs(B) else str(A.sign + B.sign)
 		carry = 0
 		# зависиомсть формулы расчета от типа операции
-		# pref = 1 if op == '+' else -1
 		# NEWIT теперь зависимость только от знака числа
 		pref = 1 if A.sign == B.sign else -1
 		# NEWIT имитация знака числа для настройки генератора
 		# Генератор результата суммы
-		for x, y in zip(first, second):
+		for x, y in zip(A.extract(*max_len), B.extract(*max_len)):
 			# Если попалась точка дробной части
-			# BUG когда оба числа - целые
 			if x is None and y is None:
 				yield ('.' if A.comma or B.comma else '')
 			else:
@@ -326,7 +292,6 @@ class BigFloat:
 				if len(sum) == 2:
 					carry = 1
 					sum = sum[1] if pref == 1 else str(10 + int(sum))
-					# sum = sum[1] if op == '+' else str(10 + int(sum))
 				yield sum
 		if pref == 1 and carry:
 			yield '1'
@@ -334,26 +299,13 @@ class BigFloat:
 		yield sign
 
 	def __add__(self, other):
-		# NEWIT выбор в зависимости от знака числа
-		# if self.sign != other.sign:
-			# если знаки разные, то это вычитание
-			# return self.__operation(other, '-', abs(self) >= abs(other))
-		# иначе - сложение, знак определяем в __operation
 		return self.__operation(self, other)
 
 	def __sub__(self, other):
 		other.sign = ~other.sign
-		# if self.sign != other.sign:
-		# 	return self.__operation(other, '+')
-		return self.__operation(self, other, True)
+		return self.__operation(self, other)
 
 	def __abs__(self):
 		transition = self.__copy()
 		transition.sign = Sign()
 		return transition
-
-
-# if __name__ == '__main__':
-# 	num0 = BigFloat()
-# 	print(str(num0))
-# 	print(str(abs(num0)))
