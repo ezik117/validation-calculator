@@ -30,7 +30,7 @@ class TestRegisters():
 		flag = flags.Flags()
 		reg.input('5', flag)
 		assert '5' == str(reg.value)
-		flag.ENABLE_REG_FILLING
+		flag.enable_reg_filling()
 		reg.input('4', flag)
 		assert '54' == str(reg.value)
 		reg.input('.', flag)
@@ -66,7 +66,7 @@ class TestRegisters():
 		flag = flags.Flags()
 		reg.input('.', flag)
 		assert '0.0' == str(reg.value)
-		flag.ENABLE_REG_FILLING
+		flag.enable_reg_filling()
 		reg.input('2', flag)
 		assert '0.2' == str(reg.value)
 		reg.input('7', flag)
@@ -87,7 +87,7 @@ class TestRegisters():
 		reg.input('.', flag)
 		assert '0.0' == str(reg.value)
 		# теперь CD=0
-		flag.ENABLE_REG_FILLING
+		flag.enable_reg_filling
 		reg.BS()
 		assert '0' == str(reg.value)
 		# TODO что с CD ? (должен регулироваться калькулятором)

@@ -71,13 +71,13 @@ class Flags:
 		return self.__CD
 
 	# Разрешить новый ввод
-	@property
-	def NEW_REG_FILLING(self):
+	# @property
+	def new_reg_filling(self):
 		self.__CD = True
 
 	# Заполнить текущий регистр А
-	@property
-	def ENABLE_REG_FILLING(self):
+	# @property
+	def enable_reg_filling(self):
 		self.__CD = False
 
 # ---------------------------- Флаг CONST ---------------------------- #
@@ -93,13 +93,13 @@ class Flags:
 		return not self.__CONST
 
 	# Начать новый цикл ввода операций
-	@property
-	def ENABLE_OPS_CONTINUES(self):
+	# @property
+	def enable_ops_continues(self):
 		self.__CONST = True
 
 	# Закончить текущий цикл ввода операций
-	@property
-	def DISABLE_OPS_CONTINUES(self):
+	# @property
+	def disable_ops_continues(self):
 		self.__CONST = False
 
 # ------------------------------ Флаг EQ ----------------------------- #
@@ -110,13 +110,13 @@ class Flags:
 		return self.__EQ
 
 	# Запомнить событие нажатия клавиши "равно"
-	@property
-	def EQUAL_PRESSED(self):
+	# @property
+	def equal_pressed(self):
 		self.__EQ = True
 
 	# Запомнить, что клавиша "равно" еще не нажата
-	@property
-	def EQUAL_NOT_PRESSED(self):
+	# @property
+	def equal_not_pressed(self):
 		self.__EQ = False
 
 # -------------------- проверка для pressedOpcode -------------------- #
@@ -143,14 +143,19 @@ class Flags:
 	def IS_NEXT_OPERATION(self):
 		return not self.IS_EQUAL_PRESSED and self.IS_OPS_CONTINUES
 
+	# NEWIT свойство для рефакторинга алгоритма АЛУ
+	@property
+	def IS_UNKNOWN_OPERATION(self):
+		return not self.IS_EQUAL_PRESSED and not self.IS_OPS_CONTINUES
+
 # -------------------------------------------------------------------- #
 #                                Методы                                #
 # -------------------------------------------------------------------- #
 
 	def clear(self):
-		self.NEW_REG_FILLING
-		self.DISABLE_OPS_CONTINUES
-		self.EQUAL_NOT_PRESSED
+		self.new_reg_filling()
+		self.disable_ops_continues()
+		self.equal_not_pressed()
 
 
 # -------------------------- Тестовые методы ------------------------- #
@@ -159,4 +164,4 @@ class Flags:
 		return self.__CD, self.__CONST, self.__EQ
 	
 	def control(self):
-		return str(int(self.__EQ)) + str(int(self.__CONST)) + str(int(self.__CD))
+		return str(int(self.__EQ)) + str(int(self.__CD)) + str(int(self.__CONST))

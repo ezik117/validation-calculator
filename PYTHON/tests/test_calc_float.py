@@ -29,7 +29,7 @@ class TestFlags():
 		calc.pressedDigitalKey('4')
 		assert "A='54'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
 		calc.pressedDigitalKey('.')
-		assert "A='54.'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
+		assert "A='54.0'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
 		calc.pressedDigitalKey('4')
 		assert "A='54.4'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
 		return calc
@@ -42,6 +42,7 @@ class TestFlags():
 		calc.pressedDigitalKey('\x08')
 		assert "A='54.4'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
 		calc.pressedDigitalKey('\x08')
+		assert "A='54.0'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
 		calc.pressedDigitalKey('\x08')
 		assert "A='54'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
 		calc.pressedDigitalKey('.')
@@ -70,7 +71,7 @@ class TestFlags():
 	def test_press_equal(self):
 		calc = self.test_input_first_op()
 		calc.pressedEqual()
-		assert "A='54.4'  (+)  B='66.52'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='66.52'  (+)  B='12.12'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		return calc
 
 	# проверка ввода операции после ввода первого числа
@@ -86,13 +87,13 @@ class TestFlags():
 		assert "A='10'  (-)  B='66.52'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
 		# Дроби портятся пока нереализованной операцией "-"
 		calc.pressedOpcode('+')
-		assert ("A='56.519999999999996'  (+)  B='56.519999999999996'"
+		assert ("A='56.52'  (+)  B='56.52'"
 					"  EQ=0  CD=1  CONST=1") == calc.displayRegisters()
 		calc.pressedDigitalKey('2')
-		assert ("A='2'  (+)  B='56.519999999999996'"
+		assert ("A='2'  (+)  B='56.52'"
                     "  EQ=0  CD=0  CONST=1") == calc.displayRegisters()
 		calc.pressedEqual()
-		assert ("A='56.519999999999996'  (+)  B='58.519999999999996'"
+		assert ("A='58.52'  (+)  B='2'"
                     "  EQ=1  CD=1  CONST=0") == calc.displayRegisters()
 
 	# последовательный ввод "равно" после ввода 2 чисел и одной операции
@@ -100,11 +101,11 @@ class TestFlags():
 	def test_continuos_equal(self):
 		calc = self.test_press_equal()
 		calc.pressedEqual()
-		assert "A='120.92'  (+)  B='66.52'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='78.64'  (+)  B='12.12'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		calc.pressedEqual()
-		assert "A='187.44'  (+)  B='66.52'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='90.76'  (+)  B='12.12'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		calc.pressedEqual()
-		assert "A='253.96'  (+)  B='66.52'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='102.88'  (+)  B='12.12'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		return calc
 
 	# тест нажатия клавиши ESC "очистка"
@@ -124,7 +125,7 @@ class TestFlags():
 		calc.pressedDigitalKey('2')
 		assert "A='12'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
 		calc.pressedDigitalKey('.')
-		assert "A='12.'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
+		assert "A='12.0'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
 		calc.pressedDigitalKey('1')
 		calc.pressedDigitalKey('2')
 		assert "A='12.12'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()

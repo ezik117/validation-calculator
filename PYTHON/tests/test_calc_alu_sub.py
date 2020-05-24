@@ -71,7 +71,7 @@ class TestFlags():
 	def test_press_equal(self):
 		calc = self.test_input_first_op()
 		calc.pressedEqual()
-		assert "A='54.4'  (-)  B='42.3'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='42.3'  (-)  B='12.1'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		return calc
 
 	# проверка ввода операции после ввода первого числа
@@ -90,7 +90,7 @@ class TestFlags():
 		calc.pressedDigitalKey('2')
 		assert ("A='2'  (-)  B='32.3'  EQ=0  CD=0  CONST=1") == calc.displayRegisters()
 		calc.pressedEqual()
-		assert ("A='32.3'  (-)  B='30.3'  EQ=1  CD=1  CONST=0") == calc.displayRegisters()
+		assert ("A='30.3'  (-)  B='2'  EQ=1  CD=1  CONST=0") == calc.displayRegisters()
 
 	# последовательный ввод "равно" после ввода 2 чисел и одной операции
 	# @pytest.mark.skip()
@@ -98,11 +98,11 @@ class TestFlags():
 		# WARNING пока не учитывается знак числа, только механика процесса
 		calc = self.test_press_equal()
 		calc.pressedEqual()
-		assert "A='12.1'  (-)  B='42.3'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='30.2'  (-)  B='12.1'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		calc.pressedEqual()
-		assert "A='30.2'  (-)  B='42.3'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='18.1'  (-)  B='12.1'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		calc.pressedEqual()
-		assert "A='12.1'  (-)  B='42.3'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='6.0'  (-)  B='12.1'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		return calc
 
 	# тест нажатия клавиши ESC "очистка"

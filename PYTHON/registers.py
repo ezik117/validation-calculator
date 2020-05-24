@@ -56,7 +56,7 @@ class Registry:
 	# NEWIT переведен на объект числа
 	@property
 	def comma(self):
-		return int(self._value.comma)
+		return self._value.comma
 
 	# NEWIT Длины частей (используются в АЛУ). Переведены на объект числа
 	@property
@@ -70,6 +70,10 @@ class Registry:
 	@property
 	def name(self):
 		return self.__name
+
+	@property
+	def sign(self):
+		return self._value.sign
 # --------------------------- Методы класса -------------------------- #
 
 	# сброс содержимого регистра
@@ -92,11 +96,14 @@ class Registry:
 		# NEWIT если новый ввод, создаем новый объект числа
 		if flags.IS_NEW_INPUT:
 			self._value = bf.BigFloat()
-		# Ошибка при вводе второй точки
-		if c == '.' and self._value.comma:
-			raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
+		# if c == '.' and self._value.comma:
+		# 	raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
 		if c == '.':
-			self._value.comma = True
+			# Ошибка при вводе второй точки
+			if self._value.comma:
+				raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
+			else:
+				self._value.comma = c
 		elif self._value.comma:
 			self._value.fraction += c
 		# в том числе отсекает ввод незанчащих 0 целой части
@@ -108,7 +115,7 @@ class Registry:
 	# копирует значение из другого регистра класса Registry
 	def copyFrom(self, R:'Registry'):
 		# WARNING передается ссылка на объект; это то, что нужно ?
-		self._value = R.value
+		self._value = R.value.copy()
 		# NEWIT Теперь не нужно их копировать comma, len_int, len_frac
 
 	# NEWIT prepare опять нужен, делегируется объекту числа
@@ -117,9 +124,10 @@ class Registry:
 
 	# IN: max_int - максимальная длина целой части числа из двух
 	# IN: max_frac - максимальная длина дробной части числа из двух
-	def extract(self, max_int: int=0, max_frac: int=0):
+	# WARNING не используется?
+	# def extract(self, max_int: int=0, max_frac: int=0):
 		# NEWIT пока используем ссылку на extract из BigFloat
-		return self._value.extract(max_int, max_frac)
+		# return self._value.extract(max_int, max_frac)
 
 # ------------------------ Специальные методы ------------------------ #
 
@@ -149,16 +157,28 @@ class RegistryZ(Registry):
 	# def input(self, c: str, flags: object, A, B, op):
 	# def input(self, c: str, flags: object):
 		for c in merger:
-			if c == '.' and self._value.comma:
-				raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
-			if c == '.':
-				self._value.comma = True
-			elif self._value.comma:
+			# if c == '.' and self._value.comma:
+			# 	raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
+			if c == '-' or c == '':
+				self._value.sign._sign = c
+			elif c == '.':
+				if self._value.comma:
+					raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
+				else:
+					self._value.comma = c
+					# NEWIT но, если приходит запятая, то значит собирали дробную часть,
+					# меняем местами и начинаем собирать настоящую целую часть
+					# TODO можно обрезать незначащие нули справа в дробной части
+					self._value.fraction = self._value.integer
+					self._value.integer = ''
+			# elif self._value.comma:
+			# NEWIT вначале собираем все в целое число
+			else:
 				self._value.integer = c + self._value.integer
 			# в том числе отсекает ввод незанчащих 0 целой части
 			# TODO ??? заменить self.__integer на len == 0
-			elif self._value.fraction or c != 0:
-				self._value.fraction = c + self._value.fraction
+			# elif self._value.fraction or c != 0:
+			# 	self._value.fraction = c + self._value.fraction
 
 		# print(f"A='{A}'  ({op})  B='{B}'  Z='{self}'"
 		# 		f"  CommaZ={self._value.comma}  CommaA={A.value.comma}"
