@@ -115,7 +115,7 @@ class Registry:
 	# копирует значение из другого регистра класса Registry
 	def copyFrom(self, R:'Registry'):
 		# WARNING передается ссылка на объект; это то, что нужно ?
-		self._value = R.value
+		self._value = R.value.copy()
 		# NEWIT Теперь не нужно их копировать comma, len_int, len_frac
 
 	# NEWIT prepare опять нужен, делегируется объекту числа

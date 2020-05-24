@@ -1,8 +1,9 @@
 # *****************************************************************************
-# МОДУЛЬ:    test_calculator
-# ФАЙЛ:      test_calculator.py
-# ЗАГОЛОВОК: КЛАСС тестов для калькулятора
-# ОПИСАНИЕ:  Класс служит для тестирования через pytest калькулятора Calculator
+# МОДУЛЬ:    test_calc_all_add
+# ФАЙЛ:      test_calc_all_addr.py
+# ЗАГОЛОВОК: КЛАСС тестов операций сложения
+# ОПИСАНИЕ:  Класс служит для тестирования через pytest
+#            операций сложения калькулятора Calculator
 # *****************************************************************************
 
 import pytest
@@ -11,7 +12,7 @@ import sys
 sys.path.append('..')
 from .. import calculator
 
-class TestAdd():
+class TestAllAdd():
 
 # ------------------------- Тестовые функции ------------------------- #
 
@@ -66,7 +67,7 @@ class TestAdd():
 		return calc
 
 	# операция вида (equal +B) + (equal +A)
-	def test_positive_smallB_add_equal_positive_bigA(self):
+	def test_positive_equalB_add_positive_equalA(self):
 		calc = self.test_initial()
 		calc.pressedOpcode('+')
 		assert "A='0'  (+)  B='0'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
@@ -88,7 +89,7 @@ class TestAdd():
 		return calc
 
 	# операция вида (equal -B) + (equal -A)
-	def test_negative_bigB_add_equal_negative_smallA(self):
+	def test_negative_equalB_add_negative_equalA(self):
 		calc = self.test_initial()
 		calc.pressedOpcode('-')
 		assert "A='0'  (-)  B='0'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()

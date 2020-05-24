@@ -1,8 +1,9 @@
 # *****************************************************************************
-# МОДУЛЬ:    test_calculator
-# ФАЙЛ:      test_calculator.py
-# ЗАГОЛОВОК: КЛАСС тестов для калькулятора
-# ОПИСАНИЕ:  Класс служит для тестирования через pytest калькулятора Calculator
+# МОДУЛЬ:    test_calc_all_sub
+# ФАЙЛ:      test_calc_all_sub.py
+# ЗАГОЛОВОК: КЛАСС тестов операций вычитания
+# ОПИСАНИЕ:  Класс служит для тестирования через pytest
+#            операций вычитаниякалькулятора Calculator
 # *****************************************************************************
 
 import pytest
@@ -11,7 +12,7 @@ import sys
 sys.path.append('..')
 from .. import calculator
 
-class TestSub():
+class TestAllSub():
 
 # ------------------------- Тестовые функции ------------------------- #
 
@@ -66,7 +67,7 @@ class TestSub():
 		return calc
 
 	# операция вида (equal +B) - (equal +A)
-	def test_positive_smallB_sub_equal_positive_bigA(self):
+	def test_positive_equalB_sub_positive_equalA(self):
 		calc = self.test_initial()
 		calc.pressedOpcode('+')
 		assert "A='0'  (+)  B='0'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
@@ -84,11 +85,12 @@ class TestSub():
 		calc.pressedDigitalKey('5')
 		assert "A='12.5'  (-)  B='12.5'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
 		calc.pressedEqual()
-		assert "A='0.0'  (-)  B='12.5'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		# WARNING изменение вывода 0.0 на 0 ?
+		assert "A='0'  (-)  B='12.5'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 		return calc
 
 	# операция вида (equal -B) - (equal -A)
-	def test_negative_bigB_sub_equal_negative_smallA(self):
+	def test_negative_equalB_sub_negative_equalA(self):
 		calc = self.test_initial()
 		calc.pressedOpcode('-')
 		assert "A='0'  (-)  B='0'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
@@ -100,8 +102,8 @@ class TestSub():
 		calc.pressedOpcode('-')
 		assert "A='-54.4'  (-)  B='-54.4'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
 		calc.pressedEqual()
-		# FIXME баг операции
-		assert "A='0.0'  (-)  B='-54.4'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		# WARNING изменение вывода 0.0 на 0 ?
+		assert "A='0'  (-)  B='-54.4'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 
 	# операция вида (big -B) - (small +A)
 	def test_negative_bigB_sub_positive_smallA(self):
@@ -113,15 +115,15 @@ class TestSub():
 		calc.pressedDigitalKey('.')
 		calc.pressedDigitalKey('4')
 		assert "A='54.4'  (-)  B='0'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
-		calc.pressedOpcode('+')
-		assert "A='-54.4'  (+)  B='-54.4'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
+		calc.pressedOpcode('-')
+		assert "A='-54.4'  (-)  B='-54.4'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
 		calc.pressedDigitalKey('1')
 		calc.pressedDigitalKey('2')
 		calc.pressedDigitalKey('.')
 		calc.pressedDigitalKey('5')
-		assert "A='12.5'  (+)  B='-54.4'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
+		assert "A='12.5'  (-)  B='-54.4'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
 		calc.pressedEqual()
-		assert "A='-41.9'  (+)  B='12.5'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='-66.9'  (-)  B='12.5'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
 
 	# операция вида (small -B) - (big +A)
 	def test_negative_smallB_sub_positive_bigA(self):
@@ -133,12 +135,34 @@ class TestSub():
 		calc.pressedDigitalKey('.')
 		calc.pressedDigitalKey('5')
 		assert "A='12.5'  (-)  B='0'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
-		calc.pressedOpcode('+')
-		assert "A='-12.5'  (+)  B='-12.5'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
+		calc.pressedOpcode('-')
+		assert "A='-12.5'  (-)  B='-12.5'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
 		calc.pressedDigitalKey('5')
 		calc.pressedDigitalKey('4')
 		calc.pressedDigitalKey('.')
 		calc.pressedDigitalKey('8')
-		assert "A='54.8'  (+)  B='-12.5'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
+		assert "A='54.8'  (-)  B='-12.5'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
 		calc.pressedEqual()
-		assert "A='42.3'  (+)  B='54.8'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='-67.3'  (-)  B='54.8'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+
+	# операция вида (equal -B) - (equal +A)
+	def test_negative_equalB_sub_positive_equalA(self):
+		calc = self.test_initial()
+		calc.pressedOpcode('-')
+		assert "A='0'  (-)  B='0'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
+		calc.pressedDigitalKey('1')
+		calc.pressedDigitalKey('2')
+		calc.pressedDigitalKey('.')
+		calc.pressedDigitalKey('5')
+		assert "A='12.5'  (-)  B='0'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
+		calc.pressedOpcode('-')
+		assert "A='-12.5'  (-)  B='-12.5'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
+		# второе число
+		calc.pressedDigitalKey('1')
+		calc.pressedDigitalKey('2')
+		calc.pressedDigitalKey('.')
+		calc.pressedDigitalKey('5')
+		assert "A='12.5'  (-)  B='-12.5'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
+		calc.pressedEqual()
+		# WARNING изменение вывода 0.0 на 0 ?
+		assert "A='-25.0'  (-)  B='12.5'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()

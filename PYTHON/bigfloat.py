@@ -167,7 +167,7 @@ class BigFloat:
 		return X
 
 	# Копирование объекта числа для метода abs (и возможно других)
-	def __copy(self):
+	def copy(self):
 		X = BigFloat()
 		X.integer = self.integer
 		X.fraction = self.fraction
@@ -269,22 +269,30 @@ class BigFloat:
 	# генератор сложения (генерирует сбор строки числа)
 	# IN: A - объект первого числа
 	# IN: B - объект второго числа
-	def __operation(self, A, B):
+	def __operation(self, other):
 		# Вначале нужно найти максимально длинную часть
-		max_len = A.__max_len(B)
-		if abs(A) < abs(B):
-			A, B = B, A
-		sign = str(A.sign) if abs(A) == abs(B) else str(A.sign + B.sign)
+		max_len = self.__max_len(other)
+		if abs(self) < abs(other):
+			self, other = other, self
+		sign = str(self.sign + other.sign)
+		# sign = str(A.sign) if abs(A) == abs(B) else str(A.sign + B.sign)
+		if abs(self) == abs(other):
+			if self.sign == other.sign:
+				sign = str(self.sign)
+			else:
+				yield '0'
+				# Возвращать знак необязательно ? Регистр Z по умолчанию с плюсом ?
+				return
 		carry = 0
 		# зависиомсть формулы расчета от типа операции
 		# NEWIT теперь зависимость только от знака числа
-		pref = 1 if A.sign == B.sign else -1
+		pref = 1 if self.sign == other.sign else -1
 		# NEWIT имитация знака числа для настройки генератора
 		# Генератор результата суммы
-		for x, y in zip(A.extract(*max_len), B.extract(*max_len)):
+		for x, y in zip(self.extract(*max_len), other.extract(*max_len)):
 			# Если попалась точка дробной части
 			if x is None and y is None:
-				yield ('.' if A.comma or B.comma else '')
+				yield ('.' if self.comma or other.comma else '')
 			else:
 				sum = str(x + pref * y + pref * carry)
 				carry = 0
@@ -299,13 +307,13 @@ class BigFloat:
 		yield sign
 
 	def __add__(self, other):
-		return self.__operation(self, other)
+		return self.__operation(other)
 
 	def __sub__(self, other):
 		other.sign = ~other.sign
-		return self.__operation(self, other)
+		return self.__operation(other)
 
 	def __abs__(self):
-		transition = self.__copy()
+		transition = self.copy()
 		transition.sign = Sign()
 		return transition

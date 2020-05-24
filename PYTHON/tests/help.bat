@@ -10,9 +10,12 @@ echo      3. -add   - запуск "test_calc_sign_add.py". Тестирован
 echo      4. sub    - запуск "test_calc_alu_sub.py".  Тестирование в калькуляторе только вычитания.
 echo      5. int    - запуск "test_calculator.py".    Тестирование разных операций калькулятора с целыми числами.
 echo      6. float  - запуск "test_calc_float.py".    Тестирование разных операций калькулятора с дробными числами.
+echo      7. +all   - запуск "test_calc_all_add.py".  Тестирование в калькуляторе всех вариантов операций сложения.
+echo      8. -all   - запуск "test_calc_all_sub.py".  Тестирование в калькуляторе всех вариантов операций вычитания.
+echo      9. all    - запуск -all и +all совместно.   Тестирование в калькуляторе всех вариантов операций сложения и вычитания.
 echo    Отдельные операции класса или другие классы:
-echo      7. num    - запуск "test_bigfloat.py".         Тестирование класса больших чисел BigFloat.
-echo      8. reg    - запуск "test_registers.py".        Тестирование класса регистров Registry.
-echo      9. cmp    - запуск "test_compare_bigfloat.py". Тестирование сравнения больших чисел BigFloat, в т.ч. с int и float.
-echo     10. flags  - запуск "test_flags.py".            Тестирование класса флагов Flags.
-echo     11. abs    - запуск "test_abs_bigfloat.py".     Тестирование функции abs в классе BigFloat.
+echo     10. num    - запуск "test_bigfloat.py".         Тестирование класса больших чисел BigFloat.
+echo     11. reg    - запуск "test_registers.py".        Тестирование класса регистров Registry.
+echo     12. cmp    - запуск "test_compare_bigfloat.py". Тестирование сравнения больших чисел BigFloat, в т.ч. с int и float.
+echo     13. flags  - запуск "test_flags.py".            Тестирование класса флагов Flags.
+echo     14. abs    - запуск "test_abs_bigfloat.py".     Тестирование функции abs в классе BigFloat.

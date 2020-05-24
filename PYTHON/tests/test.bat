@@ -13,4 +13,5 @@ if %1 == cmp pytest -v test_compare_bigfloat.py
 if %1 == abs pytest -v test_abs_bigfloat.py
 if %1 == +all pytest -v test_calc_all_add.py
 if %1 == -all pytest -v test_calc_all_sub.py
+if %1 == all pytest -v test_calc_all_add.py test_calc_all_sub.py
 if %1 == help help.bat
