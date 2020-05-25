@@ -1,5 +1,5 @@
 # *****************************************************************************
-# МОДУЛЬ:    GMP-CALCULATOR
+# ПРОЕКТ:    GMP-CALCULATOR
 # ФАЙЛ:      REGISTERS.PY
 # ЗАГОЛОВОК: КЛАССЫ РЕГИСТРОВ
 # ОПИСАНИЕ:  Описывает класс регистров калькулятора
@@ -37,7 +37,6 @@ class Registry:
 		self.__name = name  # буква регистра
 		# TODO Можно закрыть изменение извне, если реализовать свойства в класса регистра Z ???
 		self._value = bf.BigFloat()  # значение регистра как объект числа BigFloat
-		# NEWIT не нужны comma, len_int, len_frac
 
 # -------------------------- Свойства класса ------------------------- #
 
@@ -80,7 +79,6 @@ class Registry:
 	def clear(self):
 		# NEWIT просто создаем новый пустой объект
 		self._value = bf.BigFloat()
-		# NEWIT т.к. все контролируется объектом числа, удаляем comma, len_int, len_frac
 
 	# затереть один символ с конца
 	def BS(self):
@@ -96,8 +94,6 @@ class Registry:
 		# NEWIT если новый ввод, создаем новый объект числа
 		if flags.IS_NEW_INPUT:
 			self._value = bf.BigFloat()
-		# if c == '.' and self._value.comma:
-		# 	raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
 		if c == '.':
 			# Ошибка при вводе второй точки
 			if self._value.comma:
@@ -122,13 +118,6 @@ class Registry:
 	def truncate(self):
 		self._value.truncate()
 
-	# IN: max_int - максимальная длина целой части числа из двух
-	# IN: max_frac - максимальная длина дробной части числа из двух
-	# WARNING не используется?
-	# def extract(self, max_int: int=0, max_frac: int=0):
-		# NEWIT пока используем ссылку на extract из BigFloat
-		# return self._value.extract(max_int, max_frac)
-
 # ------------------------ Специальные методы ------------------------ #
 
 	def __str__(self):
@@ -140,10 +129,6 @@ class RegistryZ(Registry):
 	# Конструктор для открытия файла логов
 	def __init__(self):
 		super().__init__('Z')
-		# логгирование сборки числа в регистре Z
-		# self.fh = open('PYTHON/logs/input_z.log', 'w', encoding='utf8')
-		# из тестов pytest
-		# self.fh = open('input_z.log', 'w', encoding='utf8')
 
 	# NEWIT свойство значения
 	@property
@@ -152,13 +137,7 @@ class RegistryZ(Registry):
 	
 	@value.setter
 	def value(self, merger):
-		# self._value = val
-
-	# def input(self, c: str, flags: object, A, B, op):
-	# def input(self, c: str, flags: object):
 		for c in merger:
-			# if c == '.' and self._value.comma:
-			# 	raise ValueError("could not convert string to float: '{0}{1}'".format(self._value, c))
 			if c == '-' or c == '':
 				self._value.sign._sign = c
 			elif c == '.':
@@ -171,16 +150,6 @@ class RegistryZ(Registry):
 					# TODO можно обрезать незначащие нули справа в дробной части
 					self._value.fraction = self._value.integer
 					self._value.integer = ''
-			# elif self._value.comma:
 			# NEWIT вначале собираем все в целое число
 			else:
 				self._value.integer = c + self._value.integer
-			# в том числе отсекает ввод незанчащих 0 целой части
-			# TODO ??? заменить self.__integer на len == 0
-			# elif self._value.fraction or c != 0:
-			# 	self._value.fraction = c + self._value.fraction
-
-		# print(f"A='{A}'  ({op})  B='{B}'  Z='{self}'"
-		# 		f"  CommaZ={self._value.comma}  CommaA={A.value.comma}"
-		# 		f"  Zint={self._value.integer}  Zfrac={self._value.fraction}"
-		# 		f"  EQ={int(flags.EQ)}  CD={int(flags.CD)}  CONST={int(flags.CONST)}", file=self.fh)
