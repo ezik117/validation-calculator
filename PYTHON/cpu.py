@@ -14,7 +14,7 @@ from registers import Registry, RegistryZ
 
 # ------------- АРИФМЕТИЧЕСКО-ЛОГИЧЕСКОЕ УСТРОЙСТВО (АЛУ) ------------ #
 
-class ALU:
+class CPU:
 
 	def __init__(self, flags: object):
 		self.__flags = flags

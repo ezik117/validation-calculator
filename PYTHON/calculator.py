@@ -28,7 +28,7 @@ class Calculator:
 		self.flags = flags.Flags()  # флаги калькулятора
 		self.mode = mode      # включение/выключения отладочного режима
 		# в АЛУ добавляем ссылку на флаги, но сам АЛУ их не изменеят
-		self.__CPU = cpu.ALU(self.flags) # инициализация АЛУ
+		self.__CPU = cpu.CPU(self.flags) # инициализация АЛУ
 		print("press 'q' to exit, 0-9 to enter value, 'ESC'-to clear, 'ENTER' to evaluate")
 		self.displayRegisters()
 
