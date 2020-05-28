@@ -10,6 +10,7 @@ import msvcrt
 # from registers import Registry
 import flags
 import cpu
+import display
 
 class Calculator:
 	""" ОСНОВНОЙ КЛАСС КАЛЬКУЛЯТОРА """
@@ -29,7 +30,9 @@ class Calculator:
 		self.mode = mode      # включение/выключения отладочного режима
 		# в АЛУ добавляем ссылку на флаги, но сам АЛУ их не изменеят
 		self.__CPU = cpu.CPU(self.flags) # инициализация АЛУ
-		print("press 'q' to exit, 0-9 to enter value, 'ESC'-to clear, 'ENTER' to evaluate")
+		# Инициализация дисплея
+		self.__display = display.Display(self.__CPU, mode)
+		# print("press 'q' to exit, 0-9 to enter value, 'ESC'-to clear, 'ENTER' to evaluate")
 		self.displayRegisters()
 
 	# общий сброс
