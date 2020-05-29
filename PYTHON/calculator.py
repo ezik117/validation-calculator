@@ -31,9 +31,9 @@ class Calculator:
 		# в АЛУ добавляем ссылку на флаги, но сам АЛУ их не изменеят
 		self.__CPU = cpu.CPU(self.flags) # инициализация АЛУ
 		# Инициализация дисплея
-		self.__display = display.Display(self.__CPU, mode)
+		self.display = display.Display(self.__CPU, mode)
 		# print("press 'q' to exit, 0-9 to enter value, 'ESC'-to clear, 'ENTER' to evaluate")
-		self.displayRegisters()
+		# self.displayRegisters()
 
 	# общий сброс
 	def clear(self):
@@ -127,3 +127,13 @@ class Calculator:
 					self.pressedEqual()
 
 				self.displayRegisters()
+
+if __name__ == '__main__':
+	calc = Calculator(0)
+	print(calc.display.model)
+	print(calc.display.viewReg('A'))
+	print(calc.display.viewReg('B'))
+	print(calc.display.comma('B'))
+	print(calc.display.sign('B'))
+	print(calc.display.flags())
+	print(calc.display.view())

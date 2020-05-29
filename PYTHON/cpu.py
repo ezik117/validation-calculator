@@ -19,14 +19,14 @@ class CPU:
 	def __init__(self, flags: object):
 		self.__flags = flags
 		# NEWIT core ref добавляем в АЛУ регистры А и В
+		# GPRs - регистры общего назначения (РОН)
 		self.__GPRs = {
 			'A': Registry('A'),
 			'B': Registry('B'),
 			'Z': RegistryZ()
 		}
-		# self.__A = Registry('A')
-		# self.__B = Registry('B')
-		# self.__Z = RegistryZ()  # виртуальный регистр АЛУ
+		# сохраняет вид операции, чтобы не гонять его по всем функциям
+		self.__OP = None
 
 	# TODO удалить
 	@property
@@ -45,6 +45,17 @@ class CPU:
 		return self.__GPRs['A']
 		# return self.__A
 
+	@property
+	def OP(self):
+		return self.__OP
+
+	@property
+	def flags(self):
+		return self.__flags
+
+	def name(self, name):
+		return self.__GPRs[name]
+
 	# очистка АЛУ
 	def clear(self):
 		# NEWIT core ref очистка регистров
@@ -56,63 +67,86 @@ class CPU:
 
 	# NEWIT core ref делегирование методом input и BS
 	def input(self, c):
-		self.__GPRs['A'].input(c, self.__flags)
+		self.A.input(c, self.__flags)
 		# self.__A.input(c, self.__flags)
 
 	def BS(self):
-		self.__GPRs['A'].BS()
+		self.A.BS()
 		# self.__A.BS()
 
 	def truncate(self):
-		self.__GPRs['A'].truncate()
+		self.A.truncate()
 		# self.__A.truncate()
 
 	# IN: A - ссылка на регистр A
 	# IN: B - ссылка на регистр B
 	# IN: op - обрабатываемая операция
 	# NEWIT core ref обработка теперь в отдельном методе
-	def __operate(self, A: Registry, B: Registry, op: str):
+	def __operate(self, A: Registry, B: Registry):
 		# очистка регистра перед вычислением (лучше бы после, чтобы не хранить значение)
-		self.__GPRs['Z'].clear()
-		if op == '+':
-			self.__GPRs['Z'].value = B.value + A.value
-		elif op == '-':
-			self.__GPRs['Z'].value = B.value - A.value
-		elif op == '/':
-			self.__GPRs['Z'].value = str(float(B.value) / float(A.value))
-		elif op == '*':
-			self.__GPRs['Z'].value = str(float(B.value) * float(A.value))
+		self.Z.clear()
+		if self.OP == '+':
+			self.Z.value = B.value + A.value
+		elif self.OP == '-':
+			self.Z.value = B.value - A.value
+		elif self.OP == '/':
+			self.Z.value = str(float(B.value) / float(A.value))
+		elif self.OP == '*':
+			self.Z.value = str(float(B.value) * float(A.value))
 		# else:
 		# 	return  # нет операции
 
 		# TODO возможно, нужно будет очищать незначащие 0 целой части
 		# NEWIT удаление незначащих нулей дробной части
-		self.__GPRs['Z'].truncate()
+		self.Z.truncate()
 
 		# выбор алгоритма вывода результатов
 		# если нажата "равно" и операция не завершена
 	# NEWIT core ref алгоритм работы АЛУ
 	def process(self, op: str):
+		self.__OP = op
 		# Когда нажата "равно" флаг CD не имеет значения
 		if self.__flags.IS_EQUAL_PRESSED:
 			if self.__flags.IS_OPS_CONTINUES:
-				self.__operate(self.A, self.B, op)
+				self.__operate(self.A, self.B)
 				if op == '-':
 					self.A.value.sign = ~self.A.value.sign
 				self.B.copyFrom(self.A)
 				self.A.copyFrom(self.Z)
 			# если нажата "равно" и операция завершена
 			else:
-				self.__operate(self.B, self.A, op)
+				self.__operate(self.B, self.A)
 				if op == '-':
 					self.B.value.sign = ~self.B.value.sign
 				self.A.copyFrom(self.Z)
 		# если НЕ нажато "равно" нужно отследить оба флага - CD и CONST
 		else:
 			if self.__flags.IS_OPERATON_POSSIBLE:
-				self.__operate(self.A, self.B, op)
+				self.__operate(self.A, self.B)
 				self.A.copyFrom(self.Z)
 			self.B.copyFrom(self.A)
 		# NEWIT нет никаких других операций, все охватывает данный выбор
 		# ??? очистить регистр Z, чтобы не забивать память
 		# self.clear()
+
+# -------------------------- Методы для GPRs ------------------------- #
+
+	def get_regnames(self):
+		return self.__GPRs.keys()
+
+# --------------------------- Объект знака --------------------------- #
+
+	class __PI:
+
+		def __init__(self):
+			self.__op = None
+
+		@property
+		def OP(self):
+			return self.__op
+
+		def __call__(self, value):
+			if value in set('+-*/'):
+				self.__op = value
+			else:
+				raise TypeError(f"unknown operation: {value}")
