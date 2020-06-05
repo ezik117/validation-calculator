@@ -121,7 +121,7 @@ class CPU:
 				self.A.copyFrom(self.Z)
 		# если НЕ нажато "равно" нужно отследить оба флага - CD и CONST
 		else:
-			if self.__flags.IS_OPERATON_POSSIBLE:
+			if self.__flags.IS_OPERATION_POSSIBLE:
 				self.__operate(self.A, self.B)
 				self.A.copyFrom(self.Z)
 			self.B.copyFrom(self.A)

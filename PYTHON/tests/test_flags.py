@@ -105,7 +105,7 @@ class TestFlags():
 		# Нажата ли клавиша "равно" ?
 		assert flag.IS_EQUAL_PRESSED == False
 		# Можно ли провести операцию ?
-		assert flag.IS_OPERATON_POSSIBLE == False
+		assert flag.IS_OPERATION_POSSIBLE == False
 		# введена операция, разрешаем ввод нового числа (или операции)
 		flag.new_reg_filling()
 		# и отмечаем, что операция не завершена (действует)
@@ -127,7 +127,7 @@ class TestFlags():
 		# нажимаем операцию
 		flag.equal_not_pressed()
 		# Можно провести операцию ?
-		assert flag.IS_OPERATON_POSSIBLE == True
+		assert flag.IS_OPERATION_POSSIBLE == True
 		# Проверяем вид операции в АЛУ
 		assert flag.IS_A_op_B == False
 		assert flag.IS_B_op_A == False
