@@ -105,7 +105,7 @@ class TestFlags():
 		# Нажата ли клавиша "равно" ?
 		assert flag.IS_EQUAL_PRESSED == False
 		# Можно ли провести операцию ?
-		assert flag.IS_OPERATON_POSSIBLE == False
+		assert flag.IS_OPERATION_POSSIBLE == False
 		# введена операция, разрешаем ввод нового числа (или операции)
 		flag.new_reg_filling()
 		# и отмечаем, что операция не завершена (действует)
@@ -117,7 +117,8 @@ class TestFlags():
 		assert flag.IS_REG_FILLING == False
 		# Есть ли незавершенная операция операция ?
 		assert flag.IS_OPS_CONTINUES == True
-		assert flag.IS_OPS_STOPPED == False
+		# DEPRECATED
+		# assert flag.IS_OPS_STOPPED == False
 		# Нажати ли клавиша "равно" ?
 		assert flag.IS_EQUAL_PRESSED == False
 
@@ -127,11 +128,12 @@ class TestFlags():
 		# нажимаем операцию
 		flag.equal_not_pressed()
 		# Можно провести операцию ?
-		assert flag.IS_OPERATON_POSSIBLE == True
+		assert flag.IS_OPERATION_POSSIBLE == True
 		# Проверяем вид операции в АЛУ
-		assert flag.IS_A_op_B == False
-		assert flag.IS_B_op_A == False
-		assert flag.IS_NEXT_OPERATION == True
+		# DEPRECATED
+		# assert flag.IS_A_op_B == False
+		# assert flag.IS_B_op_A == False
+		# assert flag.IS_NEXT_OPERATION == True
 		# После совершения операции в АЛУ ("равно" не нажато)
 		flag.new_reg_filling()
 		flag.enable_ops_continues()
@@ -163,9 +165,10 @@ class TestFlags():
 
 		assert flag.IS_OPS_CONTINUES == True
 		# Проверяем вид операции в АЛУ
-		assert flag.IS_B_op_A == True
-		assert flag.IS_A_op_B == False
-		assert flag.IS_NEXT_OPERATION == False
+		# DEPRECATED
+		# assert flag.IS_B_op_A == True
+		# assert flag.IS_A_op_B == False
+		# assert flag.IS_NEXT_OPERATION == False
 		flag.new_reg_filling()
 		flag.disable_ops_continues()
 		# assert str(flag) == '0b101'
@@ -198,6 +201,7 @@ class TestFlags():
 		flag.equal_pressed()
 		assert flag.IS_OPS_CONTINUES == False
 		# Проверяем вид операции в АЛУ
-		assert flag.IS_B_op_A == False
-		assert flag.IS_A_op_B == True
-		assert flag.IS_NEXT_OPERATION == False
+		# DEPRECATED
+		# assert flag.IS_B_op_A == False
+		# assert flag.IS_A_op_B == True
+		# assert flag.IS_NEXT_OPERATION == False
