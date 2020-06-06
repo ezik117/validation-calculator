@@ -49,11 +49,11 @@ class Flags:
 			setattr(Flags, flag, property(lambda self:
 								getattr(self, props[0]) and getattr(self, props[1])))
 		# определить сложные флаги
-		for name, value in eflagsList.items():
+		for eflag, entry in eflagsList.items():
 			# создаем флаги и заполняем регистр EFLAGS
-			self.__EFLAGS[name] = self.__Flag(name, value)
-			setattr(Flags, name, property(lambda self, f=self.__EFLAGS[name]: f.value,
-								(lambda self, v, f=self.__EFLAGS[name]: setattr(f, 'value', v)
+			self.__EFLAGS[eflag] = self.__Flag(eflag, entry['init'])
+			setattr(Flags, eflag, property(lambda self, f=self.__EFLAGS[eflag]: f.value,
+								(lambda self, v, f=self.__EFLAGS[eflag]: setattr(f, 'value', v)
 												if v in MATH_SIGNS else self.__mistake(v))))
 
 	def __mistake(self, v):
@@ -66,6 +66,8 @@ class Flags:
 		def __init__(self, name, value):
 			self.__name = name
 			self.__value = value
+			# используется для сохранения начального значения (для очистки clear())
+			self.__initvalue = value
 		
 		@property
 		def value(self):
@@ -74,6 +76,10 @@ class Flags:
 		@value.setter
 		def value(self, val):
 			self.__value = val
+
+		# при сбросе к начальным настройкам используется сохраненное значение
+		def clear(self):
+			self.__value = self.__initvalue
 
 # ----------------------- Комбинации работы ALU ---------------------- #
 
@@ -103,16 +109,12 @@ class Flags:
 
 	# TODO будет ли работать clear? Создать динамически?
 	def clear(self):
-		self.new_reg_filling()
-		self.disable_ops_continues()
-		self.equal_not_pressed()
-		self.PI = None
-
-
-# -------------------------- Тестовые методы ------------------------- #
-
-	# def check(self):
-	# 	return self.__CD, self.__CONST, self.__EQ
-	
-	# def control(self):
-	# 	return str(int(self.__EQ)) + str(int(self.__CD)) + str(int(self.__CONST))
+		for flag in self.__FLAGS.values():
+			flag.clear()
+		for eflag in self.__EFLAGS.values():
+			eflag.clear()
+		# DEPRECATED 06-06-2020 очистка флагов через метод класса Flag
+		# self.new_reg_filling()
+		# self.disable_ops_continues()
+		# self.equal_not_pressed()
+		# self.PI = None

@@ -18,36 +18,36 @@ class TestFlags():
 	# инициализация калькулятора
 	def test_initial(self):
 		calc = calculator.Calculator(3)
-		assert "A='0'  (None)  B='0'  EQ=0  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='0'  (None)  B='0'  EQ=0  CD=1  CONST=0" == calc.display.view()
 		return calc
 
 	# ввод цифр
 	def test_input_digits(self):
 		calc = self.test_initial()
 		calc.pressedDigitalKey('5')
-		assert "A='5'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
+		assert "A='5'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.display.view()
 		calc.pressedDigitalKey('4')
-		assert "A='54'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
+		assert "A='54'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.display.view()
 		calc.pressedDigitalKey('.')
-		assert "A='54.0'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
+		assert "A='54.0'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.display.view()
 		calc.pressedDigitalKey('4')
-		assert "A='54.4'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
+		assert "A='54.4'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.display.view()
 		return calc
 
 	# проверка BackSpace BS
 	def test_BS(self):
 		calc = self.test_input_digits()
 		calc.pressedDigitalKey('8')
-		assert "A='54.48'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
+		assert "A='54.48'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.display.view()
 		calc.pressedDigitalKey('\x08')
-		assert "A='54.4'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
+		assert "A='54.4'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.display.view()
 		calc.pressedDigitalKey('\x08')
-		assert "A='54.0'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
+		assert "A='54.0'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.display.view()
 		calc.pressedDigitalKey('\x08')
-		assert "A='54'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
+		assert "A='54'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.display.view()
 		calc.pressedDigitalKey('.')
 		calc.pressedDigitalKey('4')
-		assert "A='54.4'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
+		assert "A='54.4'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.display.view()
 		return calc
 
 	# проверка ввода операции после ввода первого числа
@@ -56,14 +56,14 @@ class TestFlags():
 	def test_input_first_op(self):
 		calc = self.test_BS()
 		calc.pressedOpcode('+')
-		assert "A='54.4'  (+)  B='54.4'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
+		assert "A='54.4'  (+)  B='54.4'  EQ=0  CD=1  CONST=1" == calc.display.view()
 		calc.pressedDigitalKey('1')
 		calc.pressedDigitalKey('2')
-		assert "A='12'  (+)  B='54.4'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
+		assert "A='12'  (+)  B='54.4'  EQ=0  CD=0  CONST=1" == calc.display.view()
 		calc.pressedDigitalKey('.')
 		calc.pressedDigitalKey('1')
 		calc.pressedDigitalKey('2')
-		assert "A='12.12'  (+)  B='54.4'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
+		assert "A='12.12'  (+)  B='54.4'  EQ=0  CD=0  CONST=1" == calc.display.view()
 		return calc
 
 	# нажатие равно
@@ -71,7 +71,7 @@ class TestFlags():
 	def test_press_equal(self):
 		calc = self.test_input_first_op()
 		calc.pressedEqual()
-		assert "A='66.52'  (+)  B='12.12'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='66.52'  (+)  B='12.12'  EQ=1  CD=1  CONST=0" == calc.display.view()
 		return calc
 
 	# проверка ввода операции после ввода первого числа
@@ -80,32 +80,32 @@ class TestFlags():
 	def test_continuos_ops(self):
 		calc = self.test_input_first_op()
 		calc.pressedOpcode('-')
-		assert "A='66.52'  (-)  B='66.52'  EQ=0  CD=1  CONST=1" == calc.displayRegisters()
+		assert "A='66.52'  (-)  B='66.52'  EQ=0  CD=1  CONST=1" == calc.display.view()
 		calc.pressedDigitalKey('1')
-		assert "A='1'  (-)  B='66.52'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
+		assert "A='1'  (-)  B='66.52'  EQ=0  CD=0  CONST=1" == calc.display.view()
 		calc.pressedDigitalKey('0')
-		assert "A='10'  (-)  B='66.52'  EQ=0  CD=0  CONST=1" == calc.displayRegisters()
+		assert "A='10'  (-)  B='66.52'  EQ=0  CD=0  CONST=1" == calc.display.view()
 		# Дроби портятся пока нереализованной операцией "-"
 		calc.pressedOpcode('+')
 		assert ("A='56.52'  (+)  B='56.52'"
-					"  EQ=0  CD=1  CONST=1") == calc.displayRegisters()
+                    "  EQ=0  CD=1  CONST=1") == calc.display.view()
 		calc.pressedDigitalKey('2')
 		assert ("A='2'  (+)  B='56.52'"
-                    "  EQ=0  CD=0  CONST=1") == calc.displayRegisters()
+                    "  EQ=0  CD=0  CONST=1") == calc.display.view()
 		calc.pressedEqual()
 		assert ("A='58.52'  (+)  B='2'"
-                    "  EQ=1  CD=1  CONST=0") == calc.displayRegisters()
+                    "  EQ=1  CD=1  CONST=0") == calc.display.view()
 
 	# последовательный ввод "равно" после ввода 2 чисел и одной операции
 	# @pytest.mark.skip()
 	def test_continuos_equal(self):
 		calc = self.test_press_equal()
 		calc.pressedEqual()
-		assert "A='78.64'  (+)  B='12.12'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='78.64'  (+)  B='12.12'  EQ=1  CD=1  CONST=0" == calc.display.view()
 		calc.pressedEqual()
-		assert "A='90.76'  (+)  B='12.12'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='90.76'  (+)  B='12.12'  EQ=1  CD=1  CONST=0" == calc.display.view()
 		calc.pressedEqual()
-		assert "A='102.88'  (+)  B='12.12'  EQ=1  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='102.88'  (+)  B='12.12'  EQ=1  CD=1  CONST=0" == calc.display.view()
 		return calc
 
 	# тест нажатия клавиши ESC "очистка"
@@ -113,7 +113,7 @@ class TestFlags():
 	def test_escape_clear(self):
 		calc = self.test_continuos_equal()
 		calc.clear()
-		assert "A='0'  (None)  B='0'  EQ=0  CD=1  CONST=0" == calc.displayRegisters()
+		assert "A='0'  (None)  B='0'  EQ=0  CD=1  CONST=0" == calc.display.view()
 		# WARNING нет проверки очистки запятой
 		return calc
 
@@ -123,12 +123,12 @@ class TestFlags():
 		calc = self.test_escape_clear()
 		calc.pressedDigitalKey('1')
 		calc.pressedDigitalKey('2')
-		assert "A='12'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
+		assert "A='12'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.display.view()
 		calc.pressedDigitalKey('.')
-		assert "A='12.0'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
+		assert "A='12.0'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.display.view()
 		calc.pressedDigitalKey('1')
 		calc.pressedDigitalKey('2')
-		assert "A='12.12'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.displayRegisters()
+		assert "A='12.12'  (None)  B='0'  EQ=0  CD=0  CONST=0" == calc.display.view()
 		with pytest.raises(ValueError) as excinfo:
 			calc.pressedDigitalKey('.')
 		exception_msg = excinfo.value.args[0]
