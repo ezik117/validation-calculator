@@ -6,9 +6,8 @@
 # *****************************************************************************
 
 import msvcrt
-# NEWIT core ref имопртируем только АЛУ (в котором уже есть регистры)
-# from registers import Registry
-import flags
+# DEPRECATED 06-06-2020 инициализация флагов в CPU
+# import flags
 import cpu
 import display
 
@@ -25,15 +24,21 @@ class Calculator:
 		# self.A = Registry('A') # регистр A
 		# self.B = Registry('B') # регистр B
 		# регистр Z теперь полностью принадлежит АЛУ, в калькуляторе его нет
-		self.OP = None        # текущее арифметическое действие
-		self.flags = flags.Flags()  # флаги калькулятора
-		self.mode = mode      # включение/выключения отладочного режима
+		# DEPRECATED 06-06-2020 используем флаг PI (инициализируется в Flags)
+		# self.OP = None        # текущее арифметическое действие
+		# DEPRECATED 06-06-2020 флаги создаются в CPU
+		# self.flags = flags.Flags()  # флаги калькулятора
+		# DEPRECATED 06-06-2020 нет необходимости сохранять (используется в display)
+		# self.mode = mode      # включение/выключения отладочного режима
 		# в АЛУ добавляем ссылку на флаги, но сам АЛУ их не изменеят
-		self.__CPU = cpu.CPU(self.flags) # инициализация АЛУ
+		self.__CPU = cpu.CPU() # инициализация АЛУ
+		# ссылка на флаги
+		self.flags = self.__CPU.flags
 		# Инициализация дисплея
 		self.display = display.Display(self.__CPU, mode)
+		# DEPRECATED 06-06-2020 вывод стартовой надписи из display
 		# print("press 'q' to exit, 0-9 to enter value, 'ESC'-to clear, 'ENTER' to evaluate")
-		# self.displayRegisters()
+		self.displayRegisters()
 
 	# общий сброс
 	def clear(self):
@@ -42,24 +47,29 @@ class Calculator:
 		# self.B.clear()
 		# очищаем АЛУ (фактически только регистр Z на данном этапе)
 		self.__CPU.clear()
-		self.OP = None
-		self.flags.clear()
+		# DEPRECATED 06-06-2020 используем PI (перенос во Flags)
+		# self.OP = None
+		# DEPRECATED 06-06-2020 очистка в CPU
+		# self.flags.clear()
 
 	# отобразить содержимое регистров в соответствии с выбранным режимом mode
 	# NEWIT core ref изменение вывода регистров А и В
 	def displayRegisters(self):
-		if self.mode == 0:
-			print(f"A='{self.__CPU.A}'  ({self.OP})  B='{self.__CPU.B}'  Z='{self.__CPU.Z}'  SignZ='{self.__CPU.Z.sign}'  SignA='{self.__CPU.A.sign}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}")
-		elif self.mode == 1:
-			print("\r" + " "*50, end='\r')
-			print(f"A='{self.__CPU.A}'  ({self.OP})  B='{self.__CPU.B}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}", end="\r")
-		elif self.mode == 2:
-			print("\r" + " "*80, end="")
-			print("\r" + str(self.__CPU.A), end='')
+		if self.display.viewPrefix():
+			print(self.display.viewPrefix(), end=self.display.getEnd())
+		print(self.display.view(), end=self.display.getEnd())
+		# if self.mode == 0:
+		# 	print(f"A='{self.__CPU.A}'  ({self.__CPU.flags.PI})  B='{self.__CPU.B}'  Z='{self.__CPU.Z}'  SignZ='{self.__CPU.Z.sign}'  SignA='{self.__CPU.A.sign}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}")
+		# elif self.mode == 1:
+		# 	print("\r" + " "*50, end='\r')
+		# 	print(f"A='{self.__CPU.A}'  ({self.__CPU.flags.PI})  B='{self.__CPU.B}'  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}", end="\r")
+		# elif self.mode == 2:
+		# 	print("\r" + " "*80, end="")
+		# 	print("\r" + str(self.__CPU.A), end='')
 		# изменился вид вывода (для возможности добавления новых значений)
-		elif self.mode == 3:
-			return (f"A='{self.__CPU.A}'  ({self.OP})  B='{self.__CPU.B}'"
-				f"  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}")
+		# elif self.mode == 3:
+		# 	return (f"A='{self.__CPU.A}'  ({self.__CPU.flags.PI})  B='{self.__CPU.B}'"
+		# 		f"  EQ={int(self.flags.EQ)}  CD={int(self.flags.CD)}  CONST={int(self.flags.CONST)}")
 
 	# нажата цифровая клавиша. Ввод значения в регистр A
 	# IN: с - символ нажатой клавиши
@@ -82,11 +92,8 @@ class Calculator:
 		# NEWIT опять вводим метод для обрезки незначащих 0 дробной части
 		self.__CPU.truncate()
 		# NEWIT core ref алгоритм выбора теперь полностью в АЛУ
-		self.__CPU.process(self.OP)
-		# if self.flags.IS_OPERATON_POSSIBLE:
-		# 	self.__ALU.process(self.A, self.B, self.OP)
-		# self.B.copyFrom(self.A)
-		self.OP = c
+		self.__CPU.process()
+		self.__CPU.flags.PI = c
 		self.flags.new_reg_filling()
 		self.flags.enable_ops_continues()
 
@@ -95,11 +102,7 @@ class Calculator:
 		self.flags.equal_pressed()
 		self.__CPU.truncate()
 		# NEWIT core ref алгоритм выбора теперь полностью в АЛУ
-		self.__CPU.process(self.OP)
-		# if self.flags.IS_OPS_CONTINUES:
-		# 	self.__ALU.process(self.A, self.B, self.OP)
-		# else:
-		# 	self.__ALU.process(self.A, self.B, self.OP)
+		self.__CPU.process()
 		self.flags.new_reg_filling()
 		self.flags.disable_ops_continues()
 
@@ -127,22 +130,3 @@ class Calculator:
 					self.pressedEqual()
 
 				self.displayRegisters()
-
-if __name__ == '__main__':
-	calc = Calculator(0)
-	# print(calc.display.model)
-	# print(calc.display.viewReg('A'))
-	# print(calc.display.viewReg('B'))
-	# print(calc.display.comma('B'))
-	# print(calc.display.sign('B'))
-	# print(calc.display.flags())
-	# print(calc.display.view())
-	# import pprint
-	# pprint.pprint(calc.flags.__class__.__dict__)
-	print('CD    ->', calc.flags.CD)
-	print('CONST ->', calc.flags.CONST)
-	print('CD    ->', calc.flags.IS_NEW_INPUT)
-	calc.flags.enable_reg_filling()
-	print('CD    ->', calc.flags.IS_NEW_INPUT)
-	calc.flags.enable_ops_continues()
-	print('CONST ->', calc.flags.CONST)

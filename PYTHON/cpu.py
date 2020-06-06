@@ -1,4 +1,5 @@
 from registers import Registry, RegistryZ
+import flags
 
 # TODO реконструкция ALU
 # Причины:
@@ -16,8 +17,8 @@ from registers import Registry, RegistryZ
 
 class CPU:
 
-	def __init__(self, flags: object):
-		self.__flags = flags
+	def __init__(self):
+		self.__flags = flags.Flags()
 		# NEWIT core ref добавляем в АЛУ регистры А и В
 		# GPRs - регистры общего назначения (РОН)
 		self.__GPRs = {
@@ -26,7 +27,8 @@ class CPU:
 			'Z': RegistryZ()
 		}
 		# сохраняет вид операции, чтобы не гонять его по всем функциям
-		self.__OP = None
+		# DEPRECATED 06-06-2020 используем флаг PI
+		# self.__OP = None
 
 	# TODO удалить
 	@property
@@ -45,9 +47,10 @@ class CPU:
 		return self.__GPRs['A']
 		# return self.__A
 
-	@property
-	def OP(self):
-		return self.__OP
+	# DEPRECATED 06-06-2020 вывод из Flags
+	# @property
+	# def OP(self):
+	# 	return self.__OP
 
 	@property
 	def flags(self):
@@ -60,7 +63,9 @@ class CPU:
 	def clear(self):
 		# NEWIT core ref очистка регистров
 		for reg in self.__GPRs:
-			reg.clear()
+			self.__GPRs[reg].clear()
+		# очистка флагов
+		self.__flags.clear()
 		# self.__A.clear()
 		# self.__B.clear()
 		# self.__Z.clear()
@@ -85,13 +90,13 @@ class CPU:
 	def __operate(self, A: Registry, B: Registry):
 		# очистка регистра перед вычислением (лучше бы после, чтобы не хранить значение)
 		self.Z.clear()
-		if self.OP == '+':
+		if self.__flags.PI == '+':
 			self.Z.value = B.value + A.value
-		elif self.OP == '-':
+		elif self.__flags.PI == '-':
 			self.Z.value = B.value - A.value
-		elif self.OP == '/':
+		elif self.__flags.PI == '/':
 			self.Z.value = str(float(B.value) / float(A.value))
-		elif self.OP == '*':
+		elif self.__flags.PI == '*':
 			self.Z.value = str(float(B.value) * float(A.value))
 		# else:
 		# 	return  # нет операции
@@ -103,20 +108,21 @@ class CPU:
 		# выбор алгоритма вывода результатов
 		# если нажата "равно" и операция не завершена
 	# NEWIT core ref алгоритм работы АЛУ
-	def process(self, op: str):
-		self.__OP = op
+	def process(self):
+		# DEPRECATED 06-06-2020 используется флаг PI
+		# self.__OP = op
 		# Когда нажата "равно" флаг CD не имеет значения
 		if self.__flags.IS_EQUAL_PRESSED:
 			if self.__flags.IS_OPS_CONTINUES:
 				self.__operate(self.A, self.B)
-				if op == '-':
+				if self.__flags.PI == '-':
 					self.A.value.sign = ~self.A.value.sign
 				self.B.copyFrom(self.A)
 				self.A.copyFrom(self.Z)
 			# если нажата "равно" и операция завершена
 			else:
 				self.__operate(self.B, self.A)
-				if op == '-':
+				if self.__flags.PI == '-':
 					self.B.value.sign = ~self.B.value.sign
 				self.A.copyFrom(self.Z)
 		# если НЕ нажато "равно" нужно отследить оба флага - CD и CONST
@@ -136,17 +142,17 @@ class CPU:
 
 # --------------------------- Объект знака --------------------------- #
 
-	class __PI:
+	# class __PI:
 
-		def __init__(self):
-			self.__op = None
+	# 	def __init__(self):
+	# 		self.__op = None
 
-		@property
-		def OP(self):
-			return self.__op
+	# 	@property
+	# 	def OP(self):
+	# 		return self.__op
 
-		def __call__(self, value):
-			if value in set('+-*/'):
-				self.__op = value
-			else:
-				raise TypeError(f"unknown operation: {value}")
+	# 	def __call__(self, value):
+	# 		if value in set('+-*/'):
+	# 			self.__op = value
+	# 		else:
+	# 			raise TypeError(f"unknown operation: {value}")

@@ -7,7 +7,10 @@
 # *****************************************************************************
 
 # Импортирование констант
-from appregistry import CD, CONST, EQ, PI
+# DEPRECATED 06-06-2020
+# from appregistry import CD, CONST, EQ, PI
+# Импортирование констант знаков математических операций
+from appregistry import MATH_SIGNS
 # Импортирование конфигурации флагов
 from appregistry import flagsList, eflagsList
 class Flags:
@@ -51,7 +54,7 @@ class Flags:
 			self.__EFLAGS[name] = self.__Flag(name, value)
 			setattr(Flags, name, property(lambda self, f=self.__EFLAGS[name]: f.value,
 								(lambda self, v, f=self.__EFLAGS[name]: setattr(f, 'value', v)
-												if v in set('+-/*') else self.__mistake(v))))
+												if v in MATH_SIGNS else self.__mistake(v))))
 
 	def __mistake(self, v):
 		raise ValueError(f"invalid operation for calculator: '{v}'")
@@ -103,6 +106,7 @@ class Flags:
 		self.new_reg_filling()
 		self.disable_ops_continues()
 		self.equal_not_pressed()
+		self.PI = None
 
 
 # -------------------------- Тестовые методы ------------------------- #
